@@ -1,0 +1,36 @@
+{
+  "name": "bella-fashion-store-api",
+  "version": "1.0.0",
+  "description": "API for bella fashion store",
+  "main": "server.js",
+  "scripts": {
+    "start": "npm run prod",
+    "prod": "cross-env NODE_ENV=production server",
+    "dev": "cross-env NODE_ENV=development npm run server",
+    "server": "node ./src/server.js",
+    "watch:dev": "nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "nodemonConfig": {
+    "exec": "npm run dev",
+    "watch": [
+      "src/*"
+    ],
+    "ignore": [
+      "**/test/**",
+      "*.test.js",
+      "*.spec.js"
+    ]
+  },
+  "author": "Nuwan Karunarathna",
+  "license": "ISC",
+  "dependencies": {
+    "app-root-path": "^3.0.0",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.2",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.7",
+    "nodemon": "^2.0.2",
+    "winston": "^3.2.1"
+  }
+}
