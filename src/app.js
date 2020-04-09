@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const { API_PREFIX } = require("./config");
 const { registerMiddleware, routes } = require("./api");
