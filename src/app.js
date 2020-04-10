@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const { API_PREFIX } = require("./config");
-const { registerMiddleware, routes } = require("./api");
+const { registerMiddleware, registerErrorHandlers, routes } = require("./api");
 const mongoConnection = require("./db");
 
 // create dabase connection
@@ -15,5 +15,8 @@ registerMiddleware(app);
 
 // apply routes
 app.use(API_PREFIX, routes());
+
+// error handlers
+registerErrorHandlers(app);
 
 module.exports = app;

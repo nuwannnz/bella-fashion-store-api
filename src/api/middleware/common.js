@@ -1,7 +1,9 @@
 const cors = require("cors");
 const express = require("express");
+const errorHanlders = require("./errorHanlders");
+const ErrorHandler = require("../../util/errorHandlers");
 
-module.exports = app => {
+module.exports = (app) => {
   // Add cors
   app.use(cors({ credentials: true, origin: true }));
 
@@ -15,7 +17,7 @@ module.exports = app => {
       "POST",
       "GET",
       "DELETE",
-      "PUT"
+      "PUT",
     ]);
     next();
   });

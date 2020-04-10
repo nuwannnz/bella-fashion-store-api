@@ -15,7 +15,11 @@ module.exports = {
   },
 
   jwt: {
-    secret: process.env.JWT_SEC || "combellaapi",
+    secret: process.env.JWT_SECRET || "combellaapi",
+    tokenOptions: {
+      expiresIn: "1d",
+      issuer: "bella-fashion-store",
+    },
   },
 
   PORT: process.env.PORT || 5000,
