@@ -2,7 +2,7 @@ const staffService = require("../../services/staff.service");
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
-const { logger } = require("../../util");
+const { logger, email: emailUtil } = require("../../util");
 
 /**@description Login the staff member
  *
@@ -19,8 +19,12 @@ const login = async (req, res, next) => {
     const loginResult = await staffService.login(email, password);
 
     if (loginResult.isAuth) {
+      // get the staff member
+
+      const staffMember = await staffService.getStaffMemberByEmail(email);
+
       // create a token
-      const payload = { user: email };
+      const payload = { email, id: staffMember._id };
       const token = jwt.sign(
         payload,
         config.jwt.secret,
@@ -28,8 +32,15 @@ const login = async (req, res, next) => {
       );
 
       const result = {
+        isAuth: true,
         token,
-        isNew: result.isNew,
+        user: {
+          email: staffMember.email,
+          fName: staffMember.fName,
+          lname: staffMember.lName,
+          role: staffMember.role,
+          isNew: staffMember.isNewMember
+        }
       };
 
       // send response
@@ -42,6 +53,114 @@ const login = async (req, res, next) => {
   }
 };
 
+const signupAdmin = async (req, res, next) => {
+  const { email, fName, lName } = req.body;
+
+  try {
+    if (!email || !fName || !lName) {
+      // missing fields
+      throw new HTTP403Error("Email, first name and last name are required");
+    }
+
+    if (await staffService.emailExist(email)) {
+      throw new HTTP403Error("Email already exist");
+    }
+
+    const result = await staffService.addStaffMember({
+      email,
+      fName,
+      lName,
+      role: "admin",
+    });
+    if (result.success) {
+      //   send email with tmp password
+      await emailUtil.sendStaffTempPasswordMsg(
+        email,
+        fName,
+        result.password
+      );
+      res.json({ success: true });
+    } else {
+      res.json({ success: false });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const hasAdmin = async (req, res, next) => {
+  try {
+    const adminCount = await staffService.getAdminCount();
+    if (adminCount > 0) {
+
+      res.json({
+        hasAnAdmin: true
+      });
+      return;
+    }
+    res.json({
+      hasAnAdmin: false
+    })
+  } catch (error) {
+    next(error);
+  }
+}
+
+const updateTemporaryPassword = async (req, res, next) => {
+  const { updatedPassword } = req.body;
+
+  try {
+
+    // get info added by the auth token
+    const userInfo = req.decoded;
+
+    if (!staffService.getIsNewUser(userInfo.id)) {
+      throw new HTTP403Error('Only a new member can update a temporary password.');
+    }
+
+
+    if (!updatedPassword) {
+      throw new HTTP403Error('Updated password is required!');
+    }
+
+    const result = await staffService.updatePassword(userInfo.id, updateTemporaryPassword);
+
+    if (result) {
+      res.json({
+        success: true
+      })
+    }
+    res.json({
+      success: false
+    })
+
+  } catch (error) {
+    next(error);
+  }
+}
+
+const getUser = async (req, res, next) => {
+
+  try {
+    const userInfo = req.decoded;
+
+    const staffMember = await staffService.getStaffMemberByEmail(userInfo.email);
+
+    if (!staffMember) {
+      throw new HTTP401Error("Unauthorized");
+    }
+
+    res.json(staffMember);
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   login,
+  signupAdmin,
+  hasAdmin,
+  updateTemporaryPassword,
+  getUser
 };

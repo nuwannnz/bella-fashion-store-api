@@ -23,7 +23,10 @@ const StaffMember = new mongoose.Schema(
       type: String,
       required: true,
     },
-    isNewMember: Boolean,
+    isNewMember: {
+      type: Boolean,
+      default: true,
+    },
     lastLogin: Date,
   },
   {
