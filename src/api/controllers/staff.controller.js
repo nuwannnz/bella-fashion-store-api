@@ -39,7 +39,7 @@ const login = async (req, res, next) => {
           fName: staffMember.fName,
           lname: staffMember.lName,
           role: staffMember.role,
-          isNew: staffMember.isNewMember
+          isNewMember: staffMember.isNewMember
         }
       };
 
@@ -124,16 +124,18 @@ const updateTemporaryPassword = async (req, res, next) => {
       throw new HTTP403Error('Updated password is required!');
     }
 
-    const result = await staffService.updatePassword(userInfo.id, updateTemporaryPassword);
+    const result = await staffService.updatePassword(userInfo.id, updatedPassword);
 
     if (result) {
       res.json({
         success: true
       })
+    } else {
+
+      res.json({
+        success: false
+      })
     }
-    res.json({
-      success: false
-    })
 
   } catch (error) {
     next(error);
