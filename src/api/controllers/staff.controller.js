@@ -1,4 +1,5 @@
 const staffService = require("../../services/staff.service");
+const roleService = require('../../services/role.service');
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
@@ -31,6 +32,7 @@ const login = async (req, res, next) => {
         config.jwt.tokenOptions
       );
 
+      const role = await roleService.getRoleById(staffMember.role);
       const result = {
         isAuth: true,
         token,
@@ -38,7 +40,10 @@ const login = async (req, res, next) => {
           email: staffMember.email,
           fName: staffMember.fName,
           lname: staffMember.lName,
-          role: staffMember.role,
+          role: {
+            name: role.name,
+            permissions: role.permissions
+          },
           isNew: staffMember.isNewMember
         }
       };
@@ -66,11 +71,13 @@ const signupAdmin = async (req, res, next) => {
       throw new HTTP403Error("Email already exist");
     }
 
+    const adminRoleId = await roleService.getAdminRoleId();
+
     const result = await staffService.addStaffMember({
       email,
       fName,
       lName,
-      role: "admin",
+      role: adminRoleId,
     });
     if (result.success) {
       //   send email with tmp password
@@ -124,14 +131,14 @@ const updateTemporaryPassword = async (req, res, next) => {
       throw new HTTP403Error('Updated password is required!');
     }
 
-    const result = await staffService.updatePassword(userInfo.id, updateTemporaryPassword);
+    const result = await staffService.updatePassword(userInfo.id, updatedPassword);
 
     if (result) {
-      res.json({
+      return res.json({
         success: true
       })
     }
-    res.json({
+    return res.json({
       success: false
     })
 
@@ -151,9 +158,41 @@ const getUser = async (req, res, next) => {
       throw new HTTP401Error("Unauthorized");
     }
 
-    res.json(staffMember);
+
+    const role = await roleService.getRoleById(staffMember.role);
+    const result = {
+      isAuth: true,
+      user: {
+        email: staffMember.email,
+        fName: staffMember.fName,
+        lname: staffMember.lName,
+        role: {
+          name: role.name,
+          permissions: role.permissions
+        },
+        isNew: staffMember.isNewMember
+      }
+    };
+
+    return res.json(result);
   } catch (error) {
     next(error)
+  }
+}
+
+const addRole = async (req, res, next) => {
+  const { role } = req.body;
+
+  try {
+    if (role === null || !roleService.validateRole(role)) {
+      // invalid role object
+      throw new HTTP403Error('Missing or invalid fields in the role');
+    }
+
+    await roleService.createRole(role);
+    return res.json({ success: true });
+  } catch (error) {
+    next(error);
   }
 }
 
@@ -162,5 +201,6 @@ module.exports = {
   signupAdmin,
   hasAdmin,
   updateTemporaryPassword,
-  getUser
+  getUser,
+  addRole
 };

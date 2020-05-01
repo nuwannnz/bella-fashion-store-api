@@ -20,4 +20,5 @@ module.exports = (app) => {
   // route.get("/info", verifyJWTToken, staffController.getInfo);
   route.put("/pwd", verifyJWTToken, staffController.updateTemporaryPassword);
   route.get("/", verifyJWTToken, staffController.getUser);
+  route.post("/role", verifyJWTToken, staffController.addRole);
 };
