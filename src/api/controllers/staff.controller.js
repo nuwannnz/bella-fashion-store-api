@@ -40,16 +40,11 @@ const login = async (req, res, next) => {
           email: staffMember.email,
           fName: staffMember.fName,
           lname: staffMember.lName,
-<<<<<<< HEAD
           role: {
             name: role.name,
             permissions: role.permissions
           },
           isNew: staffMember.isNewMember
-=======
-          role: staffMember.role,
-          isNewMember: staffMember.isNewMember
->>>>>>> 7b123a4930ae6bc18f79b909405ec249c135f771
         }
       };
 
@@ -148,12 +143,9 @@ const updateTemporaryPassword = async (req, res, next) => {
         success: false
       })
     }
-<<<<<<< HEAD
     return res.json({
       success: false
     })
-=======
->>>>>>> 7b123a4930ae6bc18f79b909405ec249c135f771
 
   } catch (error) {
     next(error);
