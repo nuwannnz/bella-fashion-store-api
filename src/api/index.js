@@ -3,7 +3,7 @@ const { logger } = require("../util");
 
 const commonMiddleware = require("./middleware/common");
 const errorHandlingMiddleware = require("./middleware/errorHanlders");
-const user = require("./routes/user");
+const customer = require("./routes/customer");
 const staffMember = require("./routes/staff-member");
 
 /** @description Register commonly used middleware
@@ -26,7 +26,7 @@ exports.routes = () => {
   const router = Router();
 
   // apply routes
-  user(router);
+  customer(router);
   staffMember(router);
 
   return router;
