@@ -16,14 +16,18 @@ const StaffMember = new mongoose.Schema(
       unique: true,
     },
     role: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Role',
       required: true,
     },
     password: {
       type: String,
       required: true,
     },
-    isNewMember: Boolean,
+    isNewMember: {
+      type: Boolean,
+      default: true,
+    },
     lastLogin: Date,
   },
   {

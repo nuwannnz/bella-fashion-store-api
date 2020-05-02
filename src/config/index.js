@@ -23,5 +23,12 @@ module.exports = {
   },
 
   PORT: process.env.PORT || 5000,
+
   API_PREFIX: "/api/v1",
+
+  SEND_GRID_KEY: process.env.SENDGRID_API_KEY,
+
+  email: {
+    mainAddr: "bella.fashions.api@gmail.com",
+  },
 };

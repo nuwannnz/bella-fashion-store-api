@@ -1,5 +1,8 @@
 const StaffMember = require("../models/staff.model");
+const roleService = require('./role.service');
 const bcrypt = require("bcrypt");
+const generatePassword = require("generate-password");
+const { hashPassword } = require("../util");
 
 /**@description Check whether the given email and password combination is
  * correct for a staff member
@@ -12,7 +15,7 @@ const bcrypt = require("bcrypt");
 const login = async (email, password) => {
   const result = {
     isAuth: false,
-    isNew: false,
+
   };
   const staffMember = await StaffMember.findOne({ email });
   if (!staffMember) {
@@ -23,13 +26,95 @@ const login = async (email, password) => {
 
   if (passwordMatches) {
     result.isAuth = true;
-    result.isNew = staffMember.isNewMember;
     return result;
   } else {
     return result;
   }
 };
 
+const addStaffMember = async (staffMemberDto) => {
+  const newStaffMember = new StaffMember();
+  newStaffMember.email = staffMemberDto.email;
+  newStaffMember.fName = staffMemberDto.fName;
+  newStaffMember.lName = staffMemberDto.lName;
+  newStaffMember.role = staffMemberDto.role;
+
+  // generate password
+  const tempPassword = generatePassword.generate({
+    length: 10,
+    numbers: true,
+  });
+
+  // hash the password
+  const hashedPassword = await hashPassword(tempPassword);
+  newStaffMember.password = hashedPassword;
+
+  const addedRecord = await newStaffMember.save();
+
+  if (addedRecord) {
+    return { success: true, password: tempPassword };
+  }
+
+  return { success: false, password: tempPassword };
+};
+
+const getAdminCount = async () => {
+  const adminRoleId = await roleService.getAdminRoleId();
+  const adminCount = await StaffMember.find({ role: adminRoleId }).countDocuments();
+  return adminCount;
+}
+
+const emailExist = async (email) => {
+  const userCountWithEmail = await StaffMember.find({ email }).countDocuments();
+  return userCountWithEmail !== 0;
+}
+
+const updatePassword = async (id, newPassword) => {
+  const staffMember = await StaffMember.findOne({ _id: id });
+
+  if (!staffMember) {
+    return false;
+  }
+
+  // hash password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  staffMember.password = hashedPassword;
+  staffMember.isNewMember = false;
+
+  await staffMember.save();
+
+  return true;
+
+}
+
+const getIsNewUser = async (id) => {
+  const staffMember = await StaffMember.findOne({ _id: id });
+
+  if (!staffMember) {
+    return false;
+  }
+
+  return staffMember.isNewMember
+}
+
+const getStaffMemberByEmail = async (email) => {
+  const staffMember = await StaffMember.findOne({ email });
+
+  if (!staffMember) {
+    return null;
+  }
+
+  return staffMember;
+}
+
+
 module.exports = {
   login,
+  addStaffMember,
+  getAdminCount,
+  updatePassword,
+  getIsNewUser,
+  getStaffMemberByEmail,
+  emailExist
 };

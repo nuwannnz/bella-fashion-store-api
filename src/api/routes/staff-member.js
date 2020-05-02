@@ -12,10 +12,13 @@ module.exports = (app) => {
 
   // non-auth routes
   route.post("/login", staffController.login);
-  // route.post("/admin/signup", staffController.signupAdmin);
+  route.post("/admin/signup", staffController.signupAdmin);
+  route.get("/admin/has", staffController.hasAdmin);
 
   // // auth reqired routes
   // route.post("/", verifyJWTToken, staffController.addUser);
   // route.get("/info", verifyJWTToken, staffController.getInfo);
-  // route.put("/pwd", verifyJWTToken, staffController.updatePassword);
+  route.put("/pwd", verifyJWTToken, staffController.updateTemporaryPassword);
+  route.get("/", verifyJWTToken, staffController.getUser);
+  route.post("/role", verifyJWTToken, staffController.addRole);
 };
