@@ -1,14 +1,14 @@
 const customerService = require("../../services/customer.service");
-const { logger } = require("../../util");
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
-const { logger, email, emailUtil } = require("../../util");
+const emailU = require("../../util/email");
+const logger = require("../../util/logger");
 
 /**@description Login the customer
  *
  */
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   logger.info("login controller");
   const { email, password } = req.body;
 
@@ -22,10 +22,10 @@ const login = (req, res, next) => {
 
     if(loginResult.isAuth) {
       //get the customer
-      const customer;
+      const customer = await customerService.getCustomerByEmail(email);
 
       // create a token
-      const payload = { user: email };
+      const payload = { email, id: customer._id };
       const token = jwt.sign(
         payload,
         config.jwt.secret,
@@ -33,8 +33,15 @@ const login = (req, res, next) => {
       );
 
       const result = {
+        isAuth: true,
         token,
-        isNew: result.isNew
+        customer: {
+          fName: customer.fName,
+          lName: customer.lName,
+          email: customer.email,
+          password: customer.password,
+          isNew: customer.isNewCustomer
+        } 
       };
 
       // send response
@@ -47,9 +54,71 @@ const login = (req, res, next) => {
   }
 };
 
-const signUp = (req, res, next) => {};
+const signUpCustomer = async (req, res, next) => {
+  const { fName, lName, email, password } = req.body;
+
+  try {
+    if(!fName || !lName || !email || !password) {
+      // Missing fields
+      throw new HTTP403Error("First name, last name, email and password are required.");
+    } 
+
+    if(await customerService.emailExist(email)) {
+      throw new HTTP403Error("Email already exist");
+    }
+
+    const result = await customerService.signUp({
+      fName,
+      lName,
+      email,
+      password
+    });
+
+    if(result.success) {
+      // Send customer joining msg from email
+      await emailU.sendCustomerJoiningMsg(
+        email,
+        fName
+      );
+      res.json({ success: true });
+    } else {
+      res.json({ success: false });
+    }
+  } catch(error) {
+    next(error);
+  }
+};
+
+const getCustomer = async (req, res, next) => {
+
+  try {
+    const customerInfo = req.decoded;
+
+    const customer = await customerService.getCustomerByEmail(customerInfo.email);
+
+    if(!customer) {
+      throw new HTTP401Error("Unauthorized");
+    }
+
+    const result = {
+      isAuth: true,
+      user: {
+        fName: customer.fName,
+        lname: customer.lName,
+        email: customer.email,
+        password: customer.password,
+        isNew: customer.isNewCustomer
+      }
+    };
+
+    return res.json(result);
+  } catch (error) {
+    next(error)
+  }
+}
 
 module.exports = {
   login,
-  signUp,
+  signUpCustomer,
+  getCustomer
 };

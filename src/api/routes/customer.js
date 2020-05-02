@@ -10,5 +10,5 @@ module.exports = app => {
 
   // register all routes
   route.get("/login", customerController.login);
-  route.post("/signup", customerController.signUp);
+  route.post("/signup", customerController.signUpCustomer);
 };
