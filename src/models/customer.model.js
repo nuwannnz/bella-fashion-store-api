@@ -19,7 +19,10 @@ const Customer = new mongoose.Schema(
       type: String,
       required: true
     },
-    isNewCustomer: Boolean,
+    isNewCustomer: {
+      type: Boolean,
+      default: true
+    },
     lastLogin: Date
   },
   {

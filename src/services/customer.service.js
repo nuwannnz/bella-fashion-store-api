@@ -1,4 +1,7 @@
 const Customer = require("../models/customer.model");
+const roleService = require("./role.service");
+const generatePassword = require("generate-password");
+const { hashPassword } = require("../util");
 const bcrypt = require("bcrypt");
 
 /**@description Check whether the given email and password combination is
@@ -10,8 +13,7 @@ const bcrypt = require("bcrypt");
  */
 const login = (email, password) => {
   const result = {
-    isAuth: false,
-    isNew: false
+    isAuth: false
   };
   const customer = await Customer.findOne({ email });
   if(!customer) {
@@ -22,12 +24,18 @@ const login = (email, password) => {
 
   if(passwordMatches) {
     result.isAuth = true;
-    result.isNew = customer.isNewCustomer;
     return result;
   } else {
     return result;
   }
 };
+
+const addCustomer = async (customerDto) => {
+  const newCustomer = new Customer();
+  newCustomer.email = customerDto.email;
+  
+}
+
 
 const signUp = useDto => {};
 

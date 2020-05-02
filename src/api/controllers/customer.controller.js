@@ -3,7 +3,7 @@ const { logger } = require("../../util");
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
-const { logger } = require("../../util");
+const { logger, email, emailUtil } = require("../../util");
 
 /**@description Login the customer
  *
@@ -21,6 +21,9 @@ const login = (req, res, next) => {
     const loginResult = await customerService.login(email, password);
 
     if(loginResult.isAuth) {
+      //get the customer
+      const customer;
+
       // create a token
       const payload = { user: email };
       const token = jwt.sign(
