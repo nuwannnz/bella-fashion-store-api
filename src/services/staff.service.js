@@ -52,10 +52,10 @@ const addStaffMember = async (staffMemberDto) => {
   const addedRecord = await newStaffMember.save();
 
   if (addedRecord) {
-    return { success: true, password: tempPassword };
+    return { success: true, password: tempPassword, user: addedRecord };
   }
 
-  return { success: false, password: tempPassword };
+  return { success: false };
 };
 
 const getAdminCount = async () => {

@@ -152,6 +152,38 @@ const updateTemporaryPassword = async (req, res, next) => {
   }
 }
 
+const addUser = async (req, res, next) => {
+  const { email, fName, lName, roleId } = req.body;
+  try {
+
+    if (!email || !fName || !lname || !roleId) {
+      throw new HTTP403Error("Required fields are missing")
+    }
+
+    // check if role exists
+    if (!await roleService.getRoleById(roleId)) {
+      throw new HTTP403Error("Invalid role provided")
+    }
+
+    const addedUser = await staffService.addStaffMember({ email, fName, lName, role: roleId });
+
+    if (!addedUser.success) {
+      throw new Error('Failed to add user');
+    }
+
+    // send email to user
+    await emailUtil.sendStaffTempPasswordMsg(email, fName, addedUser.password);
+
+    // clear password before sending the response
+    addedUser.user.password = null;
+
+    return res.json(addedUser.user.password);
+
+  } catch (error) {
+    next(error);
+  }
+}
+
 const getUser = async (req, res, next) => {
 
   try {
@@ -166,7 +198,6 @@ const getUser = async (req, res, next) => {
 
     const role = await roleService.getRoleById(staffMember.role);
     const result = {
-      isAuth: true,
       user: {
         email: staffMember.email,
         fName: staffMember.fName,
@@ -207,5 +238,6 @@ module.exports = {
   hasAdmin,
   updateTemporaryPassword,
   getUser,
-  addRole
+  addRole,
+  addUser
 };
