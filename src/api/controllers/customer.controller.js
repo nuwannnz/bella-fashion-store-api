@@ -2,8 +2,8 @@ const customerService = require("../../services/customer.service");
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
-const emailU = require("../../util/email");
-const logger = require("../../util/logger");
+const {email : emailUtil } = require("../../util");
+const {logger} = require("../../util");
 
 /**@description Login the customer
  *
@@ -76,7 +76,7 @@ const signUpCustomer = async (req, res, next) => {
 
     if(result.success) {
       // Send customer joining msg from email
-      await emailU.sendCustomerJoiningMsg(
+      await emailUtil.sendCustomerJoiningMsg(
         email,
         fName
       );

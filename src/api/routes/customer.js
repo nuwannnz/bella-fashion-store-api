@@ -9,6 +9,7 @@ module.exports = app => {
   app.use("/customer", route);
 
   // register all routes
-  route.get("/login", customerController.login);
+  route.post("/login", customerController.login);
   route.post("/signup", customerController.signUpCustomer);
+  route.get("/", verifyJWTToken, customerController.getCustomer);
 };
