@@ -156,7 +156,7 @@ const addUser = async (req, res, next) => {
   const { email, fName, lName, roleId } = req.body;
   try {
 
-    if (!email || !fName || !lname || !roleId) {
+    if (!email || !fName || !lName || !roleId) {
       throw new HTTP403Error("Required fields are missing")
     }
 
@@ -177,7 +177,7 @@ const addUser = async (req, res, next) => {
     // clear password before sending the response
     addedUser.user.password = null;
 
-    return res.json(addedUser.user.password);
+    return res.json(addedUser.user);
 
   } catch (error) {
     next(error);
