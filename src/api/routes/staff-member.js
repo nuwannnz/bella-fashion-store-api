@@ -16,8 +16,8 @@ module.exports = (app) => {
   route.get("/admin/has", staffController.hasAdmin);
 
   // // auth reqired routes
-  // route.post("/", verifyJWTToken, staffController.addUser);
-  // route.get("/info", verifyJWTToken, staffController.getInfo);
+  route.post("/", verifyJWTToken, staffController.addUser);
   route.put("/pwd", verifyJWTToken, staffController.updateTemporaryPassword);
   route.get("/", verifyJWTToken, staffController.getUser);
+  route.post("/role", verifyJWTToken, staffController.addRole);
 };

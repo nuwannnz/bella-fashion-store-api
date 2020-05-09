@@ -1,4 +1,5 @@
 const StaffMember = require("../models/staff.model");
+const roleService = require('./role.service');
 const bcrypt = require("bcrypt");
 const generatePassword = require("generate-password");
 const { hashPassword } = require("../util");
@@ -51,19 +52,20 @@ const addStaffMember = async (staffMemberDto) => {
   const addedRecord = await newStaffMember.save();
 
   if (addedRecord) {
-    return { success: true, password: tempPassword };
+    return { success: true, password: tempPassword, user: addedRecord };
   }
 
-  return { success: false, password: tempPassword };
+  return { success: false };
 };
 
 const getAdminCount = async () => {
-  const adminCount = await StaffMember.find({ role: 'admin' }).count();
+  const adminRoleId = await roleService.getAdminRoleId();
+  const adminCount = await StaffMember.find({ role: adminRoleId }).countDocuments();
   return adminCount;
 }
 
 const emailExist = async (email) => {
-  const userCountWithEmail = await StaffMember.find({ email }).count();
+  const userCountWithEmail = await StaffMember.find({ email }).countDocuments();
   return userCountWithEmail !== 0;
 }
 
