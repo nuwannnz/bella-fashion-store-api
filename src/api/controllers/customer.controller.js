@@ -39,7 +39,6 @@ const login = async (req, res, next) => {
           fName: customer.fName,
           lName: customer.lName,
           email: customer.email,
-          password: customer.password,
           isNew: customer.isNewCustomer
         } 
       };
@@ -102,11 +101,10 @@ const getCustomer = async (req, res, next) => {
 
     const result = {
       isAuth: true,
-      user: {
+      customer: {
         fName: customer.fName,
         lname: customer.lName,
         email: customer.email,
-        password: customer.password,
         isNew: customer.isNewCustomer
       }
     };
