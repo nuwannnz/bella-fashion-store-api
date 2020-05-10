@@ -154,7 +154,7 @@ const getStaffMemberById = async (id) => {
 };
 
 const getAllStaffMembers = async () => {
-  const staffMembers = await StaffMember.find();
+  const staffMembers = await StaffMember.find().populate("role");
   return staffMembers;
 };
 
@@ -162,6 +162,10 @@ const getRoleOfStaffMember = async (id) => {
   const staffMember = await StaffMember.findOne({ _id: id });
   const role = await roleService.getRoleById(staffMember.role);
   return role;
+};
+
+const staffMemberCountOfRole = async (roleId) => {
+  return await StaffMember.find({ role: roleId }).countDocuments();
 };
 
 module.exports = {
@@ -177,4 +181,5 @@ module.exports = {
   updateStaffMember,
   deleteStaffMember,
   getRoleOfStaffMember,
+  staffMemberCountOfRole,
 };

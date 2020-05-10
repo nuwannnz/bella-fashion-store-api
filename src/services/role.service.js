@@ -1,5 +1,6 @@
 const Role = require("../models/role.model");
 const staffService = require("./staff.service");
+const mongoose = require("mongoose");
 
 const getAdminRoleId = async () => {
   const adminRole = await Role.findOne({ name: "admin" });
@@ -8,6 +9,14 @@ const getAdminRoleId = async () => {
   }
 
   return adminRole._id;
+};
+
+const isAdimnRole = async (roleId) => {
+  if (typeof roleId === "string") {
+    roleId = mongoose.Types.ObjectId(roleId);
+  }
+  const adminRole = await Role.findOne({ name: "admin" });
+  return adminRole._id.equals(roleId);
 };
 
 const Permissions = {
@@ -87,12 +96,32 @@ const getRoleById = async (roleId) => {
   return role;
 };
 
+const getAllRoles = async () => {
+  const roles = await Role.find();
+
+  return roles;
+};
+
 const hasPermission = async (role, permissionKey, permissionModeKey) => {
   if (role.permissions[permissionKey][permissionModeKey]) {
     return true;
   }
 
   return false;
+};
+
+const deleteRole = async (roleId) => {
+  const deleted = await Role.deleteOne({ _id: roleId });
+  return deleted.deletedCount && deleted.deletedCount === 1;
+};
+
+const updateRole = async (roleId, name, permissions) => {
+  const role = await Role.findOne({ _id: roleId });
+
+  role.name = name;
+  role.permissions = permissions;
+
+  return await role.save();
 };
 
 module.exports = {
@@ -103,4 +132,8 @@ module.exports = {
   Permissions,
   PermissionModes,
   hasPermission,
+  getAllRoles,
+  isAdimnRole,
+  deleteRole,
+  updateRole,
 };

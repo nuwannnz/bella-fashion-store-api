@@ -329,7 +329,7 @@ const addRole = async (req, res, next) => {
   const userInfo = req.decoded;
   const user = await staffService.getStaffMemberById(userInfo.id);
 
-  if ((await roleService.getAdminRoleId()) !== user.role._id) {
+  if (!(await roleService.isAdimnRole(user.role))) {
     throw new HTTP401Error("Unauthorized");
   }
 
@@ -346,15 +346,111 @@ const addRole = async (req, res, next) => {
   }
 };
 
+const getAllRoles = async (req, res, next) => {
+  try {
+    const userInfo = req.decoded;
+    const user = await staffService.getStaffMemberById(userInfo.id);
+
+    if (!(await roleService.isAdimnRole(user.role))) {
+      throw new HTTP401Error("Unauthorized");
+    }
+
+    let roles = await roleService.getAllRoles();
+
+    roles = await roles.map(async (role) => {
+      const userCount = await staffService.staffMemberCountOfRole(role._id);
+      return {
+        _id: role._id,
+        name: role.name,
+        permissions: role.permissions,
+        userCount,
+      };
+    });
+
+    Promise.all(roles).then((updatedRoles) => res.json(updatedRoles));
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateRole = async (req, res, next) => {
+  const roleId = req.params.id;
+  const { role } = req.body;
+  try {
+    const userInfo = req.decoded;
+    const user = await staffService.getStaffMemberById(userInfo.id);
+
+    if (!(await roleService.isAdimnRole(user.role))) {
+      throw new HTTP401Error("Unauthorized");
+    }
+
+    if (await roleService.isAdimnRole(roleId)) {
+      // cannot update the admin role
+      throw new HTTP401Error("Unauthorized! Cannot update the admin account");
+    }
+
+    if (!roleId || !roleService.validateRole(role)) {
+      throw new HTTP403Error("Invalid role format");
+    }
+
+    const updatedRole = await roleService.deleteRole(
+      roleId,
+      role.name,
+      role.permissions
+    );
+
+    return res.json(updatedRole);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteRole = async (req, res, next) => {
+  const roleId = req.params.id;
+  try {
+    const userInfo = req.decoded;
+    const user = await staffService.getStaffMemberById(userInfo.id);
+
+    if (!(await roleService.isAdimnRole(user.role))) {
+      throw new HTTP401Error("Unauthorized");
+    }
+
+    if (!roleId) {
+      throw new HTTP403Error("Missing role id");
+    }
+
+    if (await roleService.isAdimnRole(roleId)) {
+      // cannot delete the admin role
+      throw new HTTP401Error("Unauthorized! Cannot delete the admin account");
+    }
+
+    if ((await staffService.staffMemberCountOfRole(roleId)) > 0) {
+      // we already have users with this role, so cannot delete it
+      throw new HTTP401Error(
+        "Cannot delete role. User count with this role is greater than zero"
+      );
+    }
+
+    const deleted = await roleService.deleteRole(roleId);
+
+    return res.json({ deleted });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   login,
   signupAdmin,
   hasAdmin,
   updateTemporaryPassword,
   getUser,
-  addRole,
   addUser,
   getAllUsers,
   updateUser,
   deleteUser,
+  addRole,
+  getAllRoles,
+  updateRole,
+  deleteRole,
 };

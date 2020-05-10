@@ -15,6 +15,12 @@ module.exports = (app) => {
   route.post("/admin/signup", staffController.signupAdmin);
   route.get("/admin/has", staffController.hasAdmin);
 
+  // role routes
+  route.post("/role", verifyJWTToken, staffController.addRole);
+  route.get("/role", verifyJWTToken, staffController.getAllRoles);
+  route.put("/role/:id", verifyJWTToken, staffController.updateRole);
+  route.delete("/role/:id", verifyJWTToken, staffController.deleteRole);
+
   // // auth reqired routes
   route.get("/", verifyJWTToken, staffController.getAllUsers);
   route.get("/:id", verifyJWTToken, staffController.getUser);
@@ -22,6 +28,4 @@ module.exports = (app) => {
   route.put("/:id", verifyJWTToken, staffController.updateUser);
   route.patch("/pwd", verifyJWTToken, staffController.updateTemporaryPassword);
   route.delete("/:id", verifyJWTToken, staffController.deleteUser);
-
-  route.post("/role", verifyJWTToken, staffController.addRole);
 };
