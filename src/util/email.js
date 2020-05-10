@@ -16,6 +16,21 @@ const sendStaffTempPasswordMsg = async (to, fname, tempPassword) => {
   await sgMail.send(msg);
 };
 
-exports.email = {
+const sendCustomerJoiningMsg = async (to, fname) => {
+  sgMail.setApiKey(config.SEND_GRID_KEY);
+  const msg = {
+    to,
+    from: config.email.mainAddr,
+    templateId: "d-6c3bb244b46847db9301db4c80309bd3",
+    dynamic_template_data: {
+      fname
+    },
+  };
+
+  await sgMail.send(msg);
+};
+
+exports.emailU = {
   sendStaffTempPasswordMsg,
+  sendCustomerJoiningMsg
 };
