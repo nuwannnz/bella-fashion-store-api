@@ -57,3 +57,10 @@ const updateCategory = async (id, newCategoryName) => {
   
   }
   
+  module.exports = {
+    getCategory,
+    createCategory,
+    createSubCategory,
+    updateCategory,
+    updateSubCategory
+}

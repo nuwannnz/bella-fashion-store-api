@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-const category = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
+const category = new mongoose.Schema(
+  {
   name: {
     type: String,
     required: true,
@@ -9,6 +9,7 @@ const category = new mongoose.Schema({
   },
   subcategory: [{
     id: {
+      type:Number,
       required: true,
       unique: true
     },

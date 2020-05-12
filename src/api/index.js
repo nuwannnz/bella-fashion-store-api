@@ -5,6 +5,7 @@ const commonMiddleware = require("./middleware/common");
 const errorHandlingMiddleware = require("./middleware/errorHanlders");
 const user = require("./routes/user");
 const staffMember = require("./routes/staff-member");
+const category = require("./routes/category");
 
 /** @description Register commonly used middleware
  * @param {Express.Application} app The radius of the circle.
@@ -28,6 +29,7 @@ exports.routes = () => {
   // apply routes
   user(router);
   staffMember(router);
+  category(router);
 
   return router;
 };

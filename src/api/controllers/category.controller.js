@@ -10,7 +10,6 @@ const getCategory= async (req, res, next) => {
       
       const result = {
         category: {
-          Id: categories._id,
           name: categories.name,
           subcategory: [{
             id: subcategory.id,
@@ -110,4 +109,12 @@ const getCategory= async (req, res, next) => {
     }
   }
   
+  module.exports = {
+    getCategory,
+    newCategory,
+    newSubCategory,
+    updateCategory,
+    updateSubCategory
+
+  };
   

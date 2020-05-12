@@ -11,10 +11,28 @@ module.exports = (app) => {
   // register all routes
 
   // admin categories
-  route.post("/category", verifyJWTToken, categoriesController.newCategory);
-  route.get("/category",  categoriesController.getCategory);
-  route.put("/category",verifyJWTToken, categoriesController.updateCategory);
-  route.post("/category", verifyJWTToken, categoriesController.newSubCategory);
-  route.put("/category", verifyJWTToken, categoriesController.updateSubCategory);
+  app.post('/', function(req, res){
+    categoriesController.newCategory()
+  });
+
+  app.get('/', function(req, res){
+    categoriesController.getCategory()
+  });
+
+  app.put('/', function(req, res){
+    categoriesController.updateCategory()
+  });
+
+  app.post('/subcategory', function(req, res){
+    categoriesController.newSubCategory()
+  });
+
+
+  app.put('/subcategory', function(req, res){
+    res.categoriesController.updateSubCategory()
+  });
+
+
+  
 
 };
