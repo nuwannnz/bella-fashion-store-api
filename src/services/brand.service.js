@@ -2,8 +2,8 @@ const Brands = require("../models/brand.model");
 
 const addBrand = async (brandDto) => {
     const newBrand = new Brands();
-    newBrand.brand_name = brandDto.brand_name;
-    newBrand.brand_added_date = new Date();
+    newBrand.name = brandDto.name;
+    newBrand.addedDate = new Date();
 
   
     const addedRecord = await newBrand.save();

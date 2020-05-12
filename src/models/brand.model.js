@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 
 const Brands = new mongoose.Schema(
   {
-    brand_name: {
+    name: {
       type:String,
       required: true
     },
     
-    brand_added_date: {
+    addedDate: {
       type: Date,
       required: true
     },

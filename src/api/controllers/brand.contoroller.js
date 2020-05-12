@@ -3,17 +3,17 @@ const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 
 const addBrands = async (req, res, next) => {
     console.log(req.body);
-      const { brand_name} = req.body;
+      const { name} = req.body;
   
        
     
       try {
-        if (!brand_name) {
+        if (!name) {
           // missing fields
           throw new HTTP403Error("Details are required");
         }
       
-        const result = await brandService.addBrand({brand_name});
+        const result = await brandService.addBrand({name});
         if (result.success) {
           res.json({ success: true });
         } else {

@@ -2,16 +2,16 @@ const mongoose = require("mongoose");
 
 const Products = new mongoose.Schema(
   {
-    product_image:{
+    image:{
       type:String
       
     },
-    product_name: {
+    name: {
       type: String,
       required: true,
     },
 
-    product_size_qty: [{
+    sizeQty: [{
       size: {
         type:String,
         required: true
@@ -22,43 +22,43 @@ const Products = new mongoose.Schema(
       }
     }],
     
-    product_brand: {
+    brand: {
       type: String,
       required: true,
     },
-    product_category: {
+    category: {
       type: String,
       required: true,
     },
-    product_sub_category: {
+    subCategory: {
       type: String,
       required: true,
     },
-    product_price: {
-      type: String,
+    price: {
+      type: Number,
       required: true,
     },
-    product_discount: {
+    discount: {
+        type: Number,
+        required: true,
+    },
+    colors: {
         type: String,
         required: true,
     },
-    product_colors: {
+    tags: {
         type: String,
         required: true,
     },
-    product_tags: {
+    description: {
         type: String,
         required: true,
     },
-    product_description: {
-        type: String,
-        required: true,
-    },
-    product_added_date: {
+    addedDate: {
       type: Date,
       required: true
     },
-    product_updated_date: {
+    updatedDate: {
       type: Date,
       
     }
