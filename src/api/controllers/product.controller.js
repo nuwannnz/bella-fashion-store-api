@@ -4,46 +4,37 @@ const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 const addProducts = async (req, res, next) => {
   console.log(req.body);
     const {
-        product_name,
-        product_size_qty,
-        product_brand,
-        product_category,
-        product_sub_category,
-        product_price,
-        product_discount,
-        product_colors,
-        product_tags,
-        product_description
+        name,
+        sizeQty,
+        brand,
+        category,
+        subCategory,
+        price,
+        discount,
+        colors,
+        tags,
+        description
      } = req.body;
 
      
   
     try {
-      if (!product_name || !product_size_qty || !product_brand || !product_category || !product_sub_category || !product_price || !product_discount || !product_colors || !product_tags || !product_description) {
+      if (!name || !sizeQty || !brand || !category || !subCategory || !price || !discount || !colors || !tags || !description) {
         // missing fields
         throw new HTTP403Error("Details are required");
       }
-      let size = [
-        {
-          name: 'S',
-          qty:12
-        },
-        {
-          name: 'M',
-          qty:12
-        }
-      ]
+      
       const result = await productService.addProduct({
-        product_name,
-        product_size_qty,
-        product_brand,
-        product_category,
-        product_sub_category,
-        product_price,
-        product_discount,
-        product_colors,
-        product_tags,
-        product_description
+        name,
+        sizeQty,
+        brand,
+        category,
+        subCategory,
+        price,
+        discount,
+        colors,
+        tags,
+        description
       });
       if (result.success) {
         res.json({ success: true });
@@ -94,28 +85,28 @@ const addProducts = async (req, res, next) => {
   const updateProduct = async (req, res, next) => {
     const { 
       _id,
-      product_name,
-      product_size_qty,
-      product_brand,
-      product_category,
-      product_sub_category,
-      product_price,
-      product_discount,
-      product_colors,
-      product_tags,
-      product_description } = req.body;
+      name,
+      sizeQty,
+      brand,
+      category,
+      subCategory,
+      price,
+      discount,
+      colors,
+      tags,
+      description } = req.body;
 
       console.log(   _id,
-        product_name,
-        product_size_qty,
-        product_brand,
-        product_category,
-        product_sub_category,
-        product_price,
-        product_discount,
-        product_colors,
-        product_tags,
-        product_description)
+        name,
+        sizeQty,
+        brand,
+        category,
+        subCategory,
+        price,
+        discount,
+        colors,
+        tags,
+        description)
   
     try {
   
@@ -127,23 +118,23 @@ const addProducts = async (req, res, next) => {
       throw new HTTP403Error('product id is not valid');
     }
 
-    if (!product_name || !product_size_qty || !product_brand || !product_category || !product_sub_category || !product_price || !product_discount || !product_colors || !product_tags || !product_description) {
+    if (!name || !sizeQty || !brand || !category || !subCategory || !price || !discount || !colors || !tags || !description) {
       // missing fields
       throw new HTTP403Error("Details are required");
     }
   
       const result = await productService.updateProduct({
         _id,
-        product_name,
-        product_size_qty,
-        product_brand,
-        product_category,
-        product_sub_category,
-        product_price,
-        product_discount,
-        product_colors,
-        product_tags,
-        product_description
+        name,
+        sizeQty,
+        brand,
+        category,
+        subCategory,
+        price,
+        discount,
+        colors,
+        tags,
+        description
       });
   
       if (result) {

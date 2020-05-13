@@ -3,18 +3,18 @@ const bcrypt = require("bcrypt");
 
 const addProduct = async (productDto) => {
     const newProduct = new Products();
-    newProduct.product_name = productDto.product_name;
-    newProduct.product_size_qty = productDto.product_size_qty;
-    newProduct.product_brand = productDto.product_brand;
+    newProduct.name = productDto.name;
+    newProduct.sizeQty = productDto.sizeQty;
+    newProduct.brand = productDto.brand;
 
-    newProduct.product_category = productDto.product_category;
-    newProduct.product_sub_category = productDto.product_sub_category;
-    newProduct.product_price = productDto.product_price;
-    newProduct.product_discount = productDto.product_discount;
-    newProduct.product_colors = productDto.product_colors;
-    newProduct.product_tags = productDto.product_tags;
-    newProduct.product_description = productDto.product_description;
-    newProduct.product_added_date = new Date();
+    newProduct.category = productDto.category;
+    newProduct.subCategory = productDto.subCategory;
+    newProduct.price = productDto.price;
+    newProduct.discount = productDto.discount;
+    newProduct.colors = productDto.colors;
+    newProduct.tags = productDto.tags;
+    newProduct.description = productDto.description;
+    newProduct.addedDate = new Date();
 
   
     const addedRecord = await newProduct.save();
@@ -57,19 +57,17 @@ const addProduct = async (productDto) => {
 
     console.log(product._id);
 
-    product.product_name = productDto.product_name;
-
-    product.product_size_qty = productDto.product_size_qty;
-
-    product.product_brand = productDto.product_brand;
-    product.product_category = productDto.product_category;
-    product.product_sub_category = productDto.product_sub_category;
-    product.product_price = productDto.product_price;
-    product.product_discount = productDto.product_discount;
-    product.product_colors = productDto.product_colors;
-    product.product_tags = productDto.product_tags;
-    product.product_description = productDto.product_description;
-    product.product_updated_date = new Date();
+    product.name = productDto.name;
+    product.sizeQty = productDto.sizeQty;
+    product.brand = productD.brand
+    product.category = productDto.category;
+    product.subCategory = productDto.subCategory;
+    product.price = productDto.price;
+    product.discount = productDto.discount;
+    product.colors = productDto.colors;
+    product.tags = productDto.tags;
+    product.description = productDto.description;
+    product.updatedDate = new Date();
   
   
     await product.save();
