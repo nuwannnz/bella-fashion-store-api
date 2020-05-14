@@ -11,26 +11,18 @@ module.exports = (app) => {
   // register all routes
 
   // admin categories
-  app.post('/', function(req, res){
-    categoriesController.newCategory()
-  });
+  route.post('/', categoriesController.newCategory);
 
-  app.get('/', function(req, res){
-    categoriesController.getCategory()
-  });
+  route.get('/',categoriesController.getCategory);
 
-  app.put('/', function(req, res){
-    categoriesController.updateCategory()
-  });
-
-  app.post('/subcategory', function(req, res){
-    categoriesController.newSubCategory()
-  });
+  route.put('/',categoriesController.updateCategory);
+  route.delete('/:id',categoriesController.deleteCategory);
+  route.delete('/:catId/:subCatId',categoriesController.deleteCategory);
 
 
-  app.put('/subcategory', function(req, res){
-    res.categoriesController.updateSubCategory()
-  });
+  route.post('/subcategory',categoriesController.newSubCategory);
+
+  route.put('/subcategory', categoriesController.updateSubCategory);
 
 
   

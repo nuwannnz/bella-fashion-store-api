@@ -8,15 +8,10 @@ const category = new mongoose.Schema(
     unique: true
   },
   subcategory: [{
-    id: {
-      type:Number,
-      required: true,
-      unique: true
-    },
-    sbname: {
+   
+    name: {
       type: String,
-      required: true,
-      unique: true
+      required: true 
     }
   }]
 });
