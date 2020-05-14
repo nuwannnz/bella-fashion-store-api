@@ -3,7 +3,7 @@ const roleService = require("../../services/role.service");
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
-const { logger, email: emailUtil } = require("../../util");
+const { logger, emailUtil } = require("../../util");
 
 /**@description Login the staff member
  *
