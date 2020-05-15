@@ -351,7 +351,7 @@ const getAllRoles = async (req, res, next) => {
     const userInfo = req.decoded;
     const user = await staffService.getStaffMemberById(userInfo.id);
 
-    if (!(await roleService.isAdimnRole(user.role))) {
+    if (!(await roleService.isAdimnRole(user.role._id))) {
       throw new HTTP401Error("Unauthorized");
     }
 
