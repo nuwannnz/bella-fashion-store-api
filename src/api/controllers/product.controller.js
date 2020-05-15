@@ -2,6 +2,7 @@ const productService = require("../../services/product.service");
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 const roleService = require("../../services/role.service");
 const staffService = require("../../services/staff.service");
+const {uploadImageToAWS} = require('../../util/awsUploader');
 
 
 
@@ -39,9 +40,22 @@ const addProducts = async (req, res, next) => {
           throw new HTTP401Error("Unauthorized");
         }
 
+        
+  // extract image files
+  const imageFiles = req.files;
+  const imageUrls = [];
+
+  // upload images to AWS and retrive URLs
+  for (let i = 0; i < imageFiles.length; i++) {
+    const image = imageFiles[i];
+    const imageUrl = await uploadImageToAWS(image);
+
+    imageUrls.push(imageUrl);
+  }
+
       const result = await productService.addProduct({
         name,
-        sizeQty,
+        sizeQty: JSON.parse(sizeQty),
         brand,
         category,
         subCategory,
@@ -49,7 +63,8 @@ const addProducts = async (req, res, next) => {
         discount,
         colors,
         tags,
-        description
+        description,
+        imageUrls
       });
       
       return res.json(result);
@@ -75,38 +90,38 @@ const addProducts = async (req, res, next) => {
     }
   }
 
-  const updateProduct = async (req, res, next) => {
-    const { 
-      _id,
-      name,
-      sizeQty,
-      brand,
-      category,
-      subCategory,
-      price,
-      discount,
-      colors,
-      tags,
-      description } = req.body;
+const updateProduct = async (req, res, next) => {
+  const {
+    _id,
+    name,
+    sizeQty,
+    brand,
+    category,
+    subCategory,
+    price,
+    discount,
+    colors,
+    tags,
+    description } = req.body;
 
-      console.log(   _id,
-        name,
-        sizeQty,
-        brand,
-        category,
-        subCategory,
-        price,
-        discount,
-        colors,
-        tags,
-        description)
-  
-    try {
-  
-      // get info added by the auth token
-      const userInfo = req.decoded;
+  console.log(_id,
+    name,
+    sizeQty,
+    brand,
+    category,
+    subCategory,
+    price,
+    discount,
+    colors,
+    tags,
+    description)
 
-      
+  try {
+
+    // get info added by the auth token
+    const userInfo = req.decoded;
+
+
     if (!productService.getProductsById(_id)) {
       throw new HTTP403Error('product id is not valid');
     }
@@ -149,7 +164,8 @@ const addProducts = async (req, res, next) => {
     } catch (error) {
       next(error);
     }
-  }
+
+}
 
   const deleteProduct = async (req, res, next) => {
 
@@ -184,11 +200,13 @@ const addProducts = async (req, res, next) => {
     } catch (error) {
       next(error)
     }
-  }
+
+  
+}
 
   module.exports = {
     addProducts,
     getAllProducts,
     updateProduct,
     deleteProduct
-  };
+  }

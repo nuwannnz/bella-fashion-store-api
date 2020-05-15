@@ -23,14 +23,14 @@ const sendCustomerJoiningMsg = async (to, fname) => {
     from: config.email.mainAddr,
     templateId: "d-6c3bb244b46847db9301db4c80309bd3",
     dynamic_template_data: {
-      fname
+      fname,
     },
   };
 
   await sgMail.send(msg);
 };
 
-exports.emailU = {
+exports.email = {
   sendStaffTempPasswordMsg,
-  sendCustomerJoiningMsg
+  sendCustomerJoiningMsg,
 };

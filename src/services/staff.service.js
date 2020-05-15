@@ -46,8 +46,8 @@ const addStaffMember = async (staffMemberDto) => {
   // generate hashed temporary password
   newStaffMember.password = hashedPassword;
 
-  const addedRecord = await newStaffMember.save();
-
+  await newStaffMember.save();
+  addedRecord = await getStaffMemberByEmail(staffMemberDto.email);
   if (addedRecord) {
     return { success: true, password: tempPassword, user: addedRecord };
   }
@@ -134,7 +134,7 @@ const getIsNewUser = async (id) => {
 };
 
 const getStaffMemberByEmail = async (email) => {
-  const staffMember = await StaffMember.findOne({ email });
+  const staffMember = await StaffMember.findOne({ email }).populate("role");
 
   if (!staffMember) {
     return null;
@@ -144,7 +144,7 @@ const getStaffMemberByEmail = async (email) => {
 };
 
 const getStaffMemberById = async (id) => {
-  const staffMember = await StaffMember.findOne({ _id: id });
+  const staffMember = await StaffMember.findOne({ _id: id }).populate("role");
 
   if (!staffMember) {
     return null;
