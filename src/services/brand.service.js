@@ -8,11 +8,11 @@ const addBrand = async (brandDto) => {
   
     const addedRecord = await newBrand.save();
   
-    if (addedRecord) {
-      return { success: true };
+    if (!addedRecord) {
+      return { succeded: false, addedEntry: null };
     }
   
-    return { success: false};
+    return { succeded: true, addedEntry: addedRecord};
   };
 
   const getBrands = async () => {
@@ -25,12 +25,15 @@ const addBrand = async (brandDto) => {
     return brand;
   }
 
-  const deleteBrandById = async (_id) => {
-    const brand = await Products.findOne({ _id });
+  const clearBrands = async () => {
+    const brand = await Brands();
+    
   
     if (!brand) {
       return null;
     }
+
+  
 
     await brand.remove();
     return true;
@@ -39,5 +42,5 @@ const addBrand = async (brandDto) => {
   module.exports = {
     addBrand,
     getBrands,
-    deleteBrandById
+    clearBrands
   };

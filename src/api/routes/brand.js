@@ -22,6 +22,6 @@ module.exports = (app) => {
   // route.post("/", verifyJWTToken, staffController.addUser);
   // route.get("/info", verifyJWTToken, staffController.getInfo);
 
-  route.delete("/:id", brandContorller.deleteBrand);
+  route.delete("/", brandContorller.clearBrands);
 
 };

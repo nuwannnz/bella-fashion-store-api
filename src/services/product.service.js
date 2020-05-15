@@ -18,12 +18,16 @@ const addProduct = async (productDto) => {
 
   
     const addedRecord = await newProduct.save();
+
+    console.log(addedRecord)
   
-    if (addedRecord) {
-      return { success: true };
+    if (!addedRecord) {
+      return { 
+        succeded: false,
+        addedEntry: null };
     }
   
-    return { success: false};
+    return { succeded: true, addedEntry: addedRecord};
   };
 
   const getProducts = async () => {
@@ -36,23 +40,13 @@ const addProduct = async (productDto) => {
     return product;
   }
 
-  const getProductsById = async (_id) => {
-    const product = await Products.findOne({ _id });
-
-    
-  
-    if (!product) {
-      return null;
-    }
-  
-    return product;
-  }
-
   const updateProduct = async (productDto) => {
     const product = await Products.findOne({ _id: productDto._id });
 
     if (!product) {
-      return false;
+      return { 
+        succeded: false,
+        addedEntry: null };
     }
 
     console.log(product._id);
@@ -71,15 +65,15 @@ const addProduct = async (productDto) => {
   
   
     await product.save();
-  
-    return true;
+
+    return { succeded: true, addedEntry: product};
   
   }
 
   const deleteProductById = async (_id) => {
     const product = await Products.findOne({ _id });
 
-
+console.log(product)
     
   
     if (!product) {
@@ -93,7 +87,6 @@ const addProduct = async (productDto) => {
   module.exports = {
     addProduct,
     getProducts,
-    getProductsById,
     updateProduct,
     deleteProductById
   };

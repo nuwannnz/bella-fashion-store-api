@@ -14,11 +14,8 @@ const addBrands = async (req, res, next) => {
         }
       
         const result = await brandService.addBrand({name});
-        if (result.success) {
-          res.json({ success: true });
-        } else {
-          res.json({ success: false });
-        }
+       
+        return res.json(result);
       } catch (error) {
         next(error);
       }
@@ -41,18 +38,17 @@ const addBrands = async (req, res, next) => {
         }
       }
 
-      const deleteBrand = async (req, res, next) => {
+      const clearBrands = async (req, res, next) => {
 
         try {
-          const brandInfo = req.params.id
       
-          const brand = await brandService.deleteBrandById(brandInfo);
+          const brand = await brandService.clearBrands();
       
           if (!brand) {
             throw new HTTP401Error("Unauthorized");
           }
       
-          res.json(brand);
+          res.json({succeded: true});
         } catch (error) {
           next(error)
         }
@@ -61,6 +57,6 @@ const addBrands = async (req, res, next) => {
       module.exports = {
         addBrands,
         getAllBrands,
-        deleteBrand
+        clearBrands
       };
     

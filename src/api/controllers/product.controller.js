@@ -1,5 +1,9 @@
 const productService = require("../../services/product.service");
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
+const roleService = require("../../services/role.service");
+const staffService = require("../../services/staff.service");
+
+
 
 const addProducts = async (req, res, next) => {
   console.log(req.body);
@@ -24,6 +28,17 @@ const addProducts = async (req, res, next) => {
         throw new HTTP403Error("Details are required");
       }
       
+      const userInfo = req.decoded;
+
+      if (
+        !(await roleService.hasPermission(
+          await staffService.getRoleOfStaffMember(userInfo.id),
+          roleService.Permissions.product,
+          roleService.PermissionModes.write
+        ))){
+          throw new HTTP401Error("Unauthorized");
+        }
+
       const result = await productService.addProduct({
         name,
         sizeQty,
@@ -36,11 +51,8 @@ const addProducts = async (req, res, next) => {
         tags,
         description
       });
-      if (result.success) {
-        res.json({ success: true });
-      } else {
-        res.json({ success: false });
-      }
+      
+      return res.json(result);
     } catch (error) {
       next(error);
     }
@@ -52,25 +64,6 @@ const addProducts = async (req, res, next) => {
       const productInfo = req.decoded;
   
       const product = await productService.getProducts();
-  
-      if (!product) {
-        throw new HTTP401Error("Unauthorized");
-      }
-  
-      res.json(product);
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  const getProductsByID = async (req, res, next) => {
-
-    try {
-      const productInfo = req.params.id
-
- 
-  
-      const product = await productService.getProductsById(productInfo);
   
       if (!product) {
         throw new HTTP401Error("Unauthorized");
@@ -122,6 +115,16 @@ const addProducts = async (req, res, next) => {
       // missing fields
       throw new HTTP403Error("Details are required");
     }
+
+
+      if (
+        !(await roleService.hasPermission(
+          await staffService.getRoleOfStaffMember(userInfo.id),
+          roleService.Permissions.product,
+          roleService.PermissionModes.write
+        ))){
+          throw new HTTP401Error("Unauthorized");
+        }
   
       const result = await productService.updateProduct({
         _id,
@@ -136,17 +139,12 @@ const addProducts = async (req, res, next) => {
         tags,
         description
       });
+
+
+      console.log(result)
+      console.log(result)
   
-      if (result) {
-        res.json({
-          success: true
-        })
-      } else {
-  
-        res.json({
-          success: false
-        })
-      }
+      return res.json(result)
   
     } catch (error) {
       next(error);
@@ -157,14 +155,32 @@ const addProducts = async (req, res, next) => {
 
     try {
       const productInfo = req.params.id
+
+      console.log(productInfo)
+
+      const userInfo = req.decoded;
+      console.log("hello1")
+      if (
+        !(await roleService.hasPermission(
+          await staffService.getRoleOfStaffMember(userInfo.id),
+          roleService.Permissions.product,
+          roleService.PermissionModes.write
+        ))){
+          throw new HTTP401Error("Unauthorized");
+        }
   
       const product = await productService.deleteProductById(productInfo);
-  
+      
+      console.log("hello2")
       if (!product) {
         throw new HTTP401Error("Unauthorized");
       }
-  
-      res.json(product);
+      
+      if (product) {
+        return res.json({ succeded: true });
+      } else {
+        return res.json({ succeded: false });
+      }
     } catch (error) {
       next(error)
     }
@@ -173,7 +189,6 @@ const addProducts = async (req, res, next) => {
   module.exports = {
     addProducts,
     getAllProducts,
-    getProductsByID,
     updateProduct,
     deleteProduct
   };
