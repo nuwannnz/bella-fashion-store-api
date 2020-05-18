@@ -78,19 +78,16 @@ const updateProduct = async (productDto) => {
 }
 
 const deleteProductById = async (_id) => {
+
   const product = await Products.findOne({ _id });
-
-
-console.log(product)
-    
   
     if (!product) {
-      return null;
+      return false;
     }
 
-  if (!product) {
-    return null;
-  }}
+    await product.remove();
+    return true;
+  }
 
   module.exports = {
     addProduct,

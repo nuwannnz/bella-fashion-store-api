@@ -172,10 +172,8 @@ const updateProduct = async (req, res, next) => {
     try {
       const productInfo = req.params.id
 
-      console.log(productInfo)
-
       const userInfo = req.decoded;
-      console.log("hello1")
+
       if (
         !(await roleService.hasPermission(
           await staffService.getRoleOfStaffMember(userInfo.id),
@@ -187,15 +185,15 @@ const updateProduct = async (req, res, next) => {
   
       const product = await productService.deleteProductById(productInfo);
       
-      console.log("hello2")
+      console.log(product)
       if (!product) {
         throw new HTTP401Error("Unauthorized");
       }
       
       if (product) {
-        return res.json({ succeded: true });
+        return res.json({ success: true });
       } else {
-        return res.json({ succeded: false });
+        return res.json({ success: false });
       }
     } catch (error) {
       next(error)

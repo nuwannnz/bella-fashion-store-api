@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const brandContorller = require("../controllers/brand.contoroller");
 const { verifyJWTToken } = require("../middleware/auth");
+const { multipleImageUpload } = require("../middleware/fileUploads");
 
 // init express router
 const route = Router();
@@ -14,7 +15,7 @@ module.exports = (app) => {
   // non-auth routes
 
   //route.post("/admin/products/add", productController.addProducts);
-  route.post("/", brandContorller.addBrands);
+  route.post("/",verifyJWTToken,multipleImageUpload, brandContorller.addBrands);
   route.get("/", brandContorller.getAllBrands);
   
 
@@ -22,6 +23,6 @@ module.exports = (app) => {
   // route.post("/", verifyJWTToken, staffController.addUser);
   // route.get("/info", verifyJWTToken, staffController.getInfo);
 
-  route.delete("/", brandContorller.clearBrands);
+  route.delete("/:id", verifyJWTToken ,brandContorller.deleteBrands);
 
 };

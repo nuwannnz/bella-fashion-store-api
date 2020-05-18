@@ -3,8 +3,10 @@ const Brands = require("../models/brand.model");
 const addBrand = async (brandDto) => {
     const newBrand = new Brands();
     newBrand.name = brandDto.name;
+    newBrand.images = brandDto.imageUrls;
     newBrand.addedDate = new Date();
 
+    console.log(newBrand.images)
   
     const addedRecord = await newBrand.save();
   
@@ -25,8 +27,8 @@ const addBrand = async (brandDto) => {
     return brand;
   }
 
-  const clearBrands = async () => {
-    const brand = await Brands();
+  const deletebrandById = async (_id) => {
+    const brand = await Brands.findOne({_id});
     
   
     if (!brand) {
@@ -42,5 +44,5 @@ const addBrand = async (brandDto) => {
   module.exports = {
     addBrand,
     getBrands,
-    clearBrands
+    deletebrandById
   };
