@@ -3,10 +3,13 @@ const { logger } = require("../util");
 
 const commonMiddleware = require("./middleware/common");
 const errorHandlingMiddleware = require("./middleware/errorHanlders");
-const user = require("./routes/user");
+const customer = require("./routes/customer");
 const staffMember = require("./routes/staff-member");
 const category = require("./routes/category");
 
+const cart = require("./routes/cart");
+const product = require("./routes/product");
+const brand = require("./routes/brand");
 /** @description Register commonly used middleware
  * @param {Express.Application} app The radius of the circle.
  * @return {void}
@@ -27,9 +30,12 @@ exports.routes = () => {
   const router = Router();
 
   // apply routes
-  user(router);
+  customer(router);
   staffMember(router);
   category(router);
+  cart(router);
+  product(router);
+  brand(router);
 
   return router;
 };

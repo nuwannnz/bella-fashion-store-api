@@ -1,9 +1,9 @@
 const staffService = require("../../services/staff.service");
-const roleService = require('../../services/role.service');
+const roleService = require("../../services/role.service");
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
-const { logger, email: emailUtil } = require("../../util");
+const { logger, emailUtil } = require("../../util");
 
 /**@description Login the staff member
  *
@@ -37,15 +37,16 @@ const login = async (req, res, next) => {
         isAuth: true,
         token,
         user: {
+          id: staffMember._id,
           email: staffMember.email,
           fName: staffMember.fName,
           lname: staffMember.lName,
           role: {
             name: role.name,
-            permissions: role.permissions
+            permissions: role.permissions,
           },
-          isNew: staffMember.isNewMember
-        }
+          isNew: staffMember.isNewMember,
+        },
       };
 
       // send response
@@ -81,11 +82,7 @@ const signupAdmin = async (req, res, next) => {
     });
     if (result.success) {
       //   send email with tmp password
-      await emailUtil.sendStaffTempPasswordMsg(
-        email,
-        fName,
-        result.password
-      );
+      await emailUtil.sendStaffTempPasswordMsg(email, fName, result.password);
       res.json({ success: true });
     } else {
       res.json({ success: false });
@@ -95,103 +92,251 @@ const signupAdmin = async (req, res, next) => {
   }
 };
 
-
 const hasAdmin = async (req, res, next) => {
   try {
     const adminCount = await staffService.getAdminCount();
     if (adminCount > 0) {
-
       res.json({
-        hasAnAdmin: true
+        hasAnAdmin: true,
       });
       return;
     }
     res.json({
-      hasAnAdmin: false
-    })
+      hasAnAdmin: false,
+    });
   } catch (error) {
     next(error);
   }
-}
+};
 
 const updateTemporaryPassword = async (req, res, next) => {
   const { updatedPassword } = req.body;
 
   try {
-
     // get info added by the auth token
     const userInfo = req.decoded;
 
     if (!staffService.getIsNewUser(userInfo.id)) {
-      throw new HTTP403Error('Only a new member can update a temporary password.');
+      throw new HTTP403Error(
+        "Only a new member can update a temporary password."
+      );
     }
-
 
     if (!updatedPassword) {
-      throw new HTTP403Error('Updated password is required!');
+      throw new HTTP403Error("Updated password is required!");
     }
 
-    const result = await staffService.updatePassword(userInfo.id, updatedPassword);
+    const result = await staffService.updatePassword(
+      userInfo.id,
+      updatedPassword
+    );
 
     if (result) {
       return res.json({
-        success: true
-      })
+        success: true,
+      });
     } else {
-
       res.json({
-        success: false
-      })
+        success: false,
+      });
     }
     return res.json({
-      success: false
-    })
-
+      success: false,
+    });
   } catch (error) {
     next(error);
   }
-}
+};
+
+const addUser = async (req, res, next) => {
+  const { email, fName, lName, roleId } = req.body;
+  try {
+    if (!email || !fName || !lName || !roleId) {
+      throw new HTTP403Error("Required fields are missing");
+    }
+
+    // check if role exists
+    if (!(await roleService.getRoleById(roleId))) {
+      throw new HTTP403Error("Invalid role provided");
+    }
+
+    const addedUser = await staffService.addStaffMember({
+      email,
+      fName,
+      lName,
+      role: roleId,
+    });
+
+    if (!addedUser.success) {
+      throw new Error("Failed to add user");
+    }
+
+    // send email to user
+    await emailUtil.sendStaffTempPasswordMsg(email, fName, addedUser.password);
+
+    // clear password before sending the response
+    addedUser.user.password = null;
+
+    return res.json(addedUser.user);
+  } catch (error) {
+    next(error);
+  }
+};
 
 const getUser = async (req, res, next) => {
-
+  const id = req.params.id;
   try {
+    if (!id) {
+      throw new HTTP403Error("User id is missing in the URL");
+    }
     const userInfo = req.decoded;
 
-    const staffMember = await staffService.getStaffMemberByEmail(userInfo.email);
+    if (id !== userInfo.id) {
+      // id and token owner id doesn't match
+      throw new HTTP401Error("Not allowed to access this information");
+    }
+
+    const staffMember = await staffService.getStaffMemberByEmail(
+      userInfo.email
+    );
 
     if (!staffMember) {
       throw new HTTP401Error("Unauthorized");
     }
 
-
     const role = await roleService.getRoleById(staffMember.role);
     const result = {
-      isAuth: true,
       user: {
+        id: staffMember._id,
         email: staffMember.email,
         fName: staffMember.fName,
         lname: staffMember.lName,
         role: {
           name: role.name,
-          permissions: role.permissions
+          permissions: role.permissions,
         },
-        isNew: staffMember.isNewMember
-      }
+        isNew: staffMember.isNewMember,
+      },
     };
 
     return res.json(result);
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
+
+const getAllUsers = async (req, res, next) => {
+  try {
+    const userInfo = req.decoded;
+    if (
+      !(await roleService.hasPermission(
+        await staffService.getRoleOfStaffMember(userInfo.id),
+        roleService.Permissions.user,
+        roleService.PermissionModes.read
+      ))
+    ) {
+      // no permission
+      throw new HTTP401Error("Not authorized");
+    }
+
+    const users = await staffService.getAllStaffMembers();
+
+    return res.json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateUser = async (req, res, next) => {
+  const id = req.params.id;
+  const { email, fName, lName, role } = req.body;
+
+  try {
+    const userInfo = req.decoded;
+    if (
+      !(await roleService.hasPermission(
+        await staffService.getRoleOfStaffMember(userInfo.id),
+        roleService.Permissions.user,
+        roleService.PermissionModes.write
+      ))
+    ) {
+      // no permission
+      throw new HTTP401Error("Not authorized");
+    }
+
+    if (!id) {
+      throw new HTTP403Error("Missing user id in the URL");
+    }
+
+    const result = await staffService.updateStaffMember({
+      id,
+      fName,
+      lName,
+      email,
+      role,
+    });
+
+    if (result.tempPassword) {
+      // email has been updated
+      // send new temporary password
+      await emailUtil.sendStaffTempPasswordMsg(
+        email,
+        fName,
+        result.tempPassword
+      );
+    }
+    const updatedStaffMember = await staffService.getStaffMemberById(id);
+
+    return res.json(updatedStaffMember);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteUser = async (req, res, next) => {
+  const id = req.params.id;
+
+  try {
+    const userInfo = req.decoded;
+
+    if (
+      !(await roleService.hasPermission(
+        await staffService.getRoleOfStaffMember(userInfo.id),
+        roleService.Permissions.user,
+        roleService.PermissionModes.write
+      ))
+    ) {
+      // no permission
+      throw new HTTP401Error("Not authorized");
+    }
+
+    if (!id) {
+      throw new HTTP403Error("Missing user id in the URL");
+    }
+
+    const result = await staffService.deleteStaffMember(id);
+    if (result) {
+      return res.json({ deleted: true });
+    }
+    return res.json({ deleted: false });
+  } catch (error) {
+    next(error);
+  }
+};
 
 const addRole = async (req, res, next) => {
   const { role } = req.body;
+  const userInfo = req.decoded;
+  const user = await staffService.getStaffMemberById(userInfo.id);
+
+  if (!(await roleService.isAdimnRole(user.role))) {
+    throw new HTTP401Error("Unauthorized");
+  }
 
   try {
-    if (role === null || !roleService.validateRole(role)) {
+    if (!role || !roleService.validateRole(role)) {
       // invalid role object
-      throw new HTTP403Error('Missing or invalid fields in the role');
+      throw new HTTP403Error("Missing or invalid fields in the role");
     }
 
     await roleService.createRole(role);
@@ -199,7 +344,100 @@ const addRole = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};
+
+const getAllRoles = async (req, res, next) => {
+  try {
+    const userInfo = req.decoded;
+    const user = await staffService.getStaffMemberById(userInfo.id);
+
+    if (!(await roleService.isAdimnRole(user.role))) {
+      throw new HTTP401Error("Unauthorized");
+    }
+
+    let roles = await roleService.getAllRoles();
+
+    roles = await roles.map(async (role) => {
+      const userCount = await staffService.staffMemberCountOfRole(role._id);
+      return {
+        _id: role._id,
+        name: role.name,
+        permissions: role.permissions,
+        userCount,
+      };
+    });
+
+    Promise.all(roles).then((updatedRoles) => res.json(updatedRoles));
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateRole = async (req, res, next) => {
+  const roleId = req.params.id;
+  const { role } = req.body;
+  try {
+    const userInfo = req.decoded;
+    const user = await staffService.getStaffMemberById(userInfo.id);
+
+    if (!(await roleService.isAdimnRole(user.role))) {
+      throw new HTTP401Error("Unauthorized");
+    }
+
+    if (await roleService.isAdimnRole(roleId)) {
+      // cannot update the admin role
+      throw new HTTP401Error("Unauthorized! Cannot update the admin account");
+    }
+
+    if (!roleId || !roleService.validateRole(role)) {
+      throw new HTTP403Error("Invalid role format");
+    }
+
+    const updatedRole = await roleService.deleteRole(
+      roleId,
+      role.name,
+      role.permissions
+    );
+
+    return res.json(updatedRole);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteRole = async (req, res, next) => {
+  const roleId = req.params.id;
+  try {
+    const userInfo = req.decoded;
+    const user = await staffService.getStaffMemberById(userInfo.id);
+
+    if (!(await roleService.isAdimnRole(user.role))) {
+      throw new HTTP401Error("Unauthorized");
+    }
+
+    if (!roleId) {
+      throw new HTTP403Error("Missing role id");
+    }
+
+    if (await roleService.isAdimnRole(roleId)) {
+      // cannot delete the admin role
+      throw new HTTP401Error("Unauthorized! Cannot delete the admin account");
+    }
+
+    if ((await staffService.staffMemberCountOfRole(roleId)) > 0) {
+      // we already have users with this role, so cannot delete it
+      throw new HTTP401Error(
+        "Cannot delete role. User count with this role is greater than zero"
+      );
+    }
+
+    const deleted = await roleService.deleteRole(roleId);
+
+    return res.json({ deleted });
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   login,
@@ -207,5 +445,12 @@ module.exports = {
   hasAdmin,
   updateTemporaryPassword,
   getUser,
-  addRole
+  addUser,
+  getAllUsers,
+  updateUser,
+  deleteUser,
+  addRole,
+  getAllRoles,
+  updateRole,
+  deleteRole,
 };
