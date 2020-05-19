@@ -31,4 +31,10 @@ module.exports = {
   email: {
     mainAddr: "bella.fashions.api@gmail.com",
   },
+
+  AWS: {
+    ACCESS_KEY: process.env.AWS_ACCESS_KEY,
+    SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    BUCKET_NAME: process.env.AWS_BELLA_IMAGE_BUCKET_NAME,
+  },
 };
