@@ -3,6 +3,8 @@ const roleService = require("./role.service");
 const generatePassword = require("generate-password");
 const { hashPassword } = require("../util");
 const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
+
 
 /**@description Check whether the given email and password combination is
  * correct
@@ -95,7 +97,7 @@ const getIsNewCustomer = async (id) => {
 }
 
 const getCustomerByEmail = async (email) => {
-  const customer = await Customer.findOne({ email });
+  const customer = await Customer.findOne({ email }).populate("wishList.product");
 
   if(!customer) {
     return null;
@@ -103,6 +105,81 @@ const getCustomerByEmail = async (email) => {
   return customer;
 }
 
+const getCustomerById = async (id) => {
+  const customer = await Customer.findOne( {_id: id} ).populate("wishList.product");
+
+  if(!customer) {
+    return null;
+  }
+  return customer;
+}
+
+const addCustomerAddress = async (customerId, addressDto) => {
+
+  const customer = await Customer.findOne({_id:customerId});
+
+  const newAddress = {
+
+    fName : addressDto.fName,
+    lName : addressDto.lName,
+    phone : addressDto.phone,
+    country : addressDto.country,
+    street : addressDto.street,
+    town : addressDto.town,
+    zip : addressDto.zip
+
+  }
+
+  customer.addresses.push(newAddress);
+  
+  
+  await customer.save();
+ 
+  return customer;
+}
+
+const deleteCustomerAddress = async (customerId, addredssId) => {
+  const customer = await Customer.findOne({_id: customerId});
+  addredssId = mongoose.Types.ObjectId(addredssId);
+  customer.addresses = customer.addresses.filter(addr => {
+    if(addr._id.equals(addredssId)) {
+      return false;
+    } else {
+      return true;
+    }
+  })
+
+  await customer.save();
+
+  return true;
+}
+
+const updateCustomerAddress = async (customerId, addressId, customerAddressDto) => {
+  const customer = await getCustomerById(customerId);
+  addressId = mongoose.Types.ObjectId(addressId);
+
+  const addressToUpdate = await customer.addresses.find((addr) => addr._id.equals(addressId));
+
+  addressToUpdate.fName = customerAddressDto.fName;
+  addressToUpdate.lName = customerAddressDto.lName;
+  addressToUpdate.phone = customerAddressDto.phone;
+  addressToUpdate.country = customerAddressDto.country;
+  addressToUpdate.street = customerAddressDto.street;
+  addressToUpdate.town = customerAddressDto.town;
+  addressToUpdate.zip = customerAddressDto.zip;
+
+
+ customer.addresses = customer.addresses.map((addr) => {
+   if(addr._id.equals(addressId)){
+     return addressToUpdate;
+   }
+   return addr;
+ })
+
+ await customer.save();
+
+ return addressToUpdate;
+}
 
 module.exports = {
   login,
@@ -110,5 +187,9 @@ module.exports = {
   emailExist,
   updatePassword,
   getIsNewCustomer,
-  getCustomerByEmail
+  getCustomerByEmail,
+  addCustomerAddress,
+  deleteCustomerAddress,
+  getCustomerById,
+  updateCustomerAddress
 };

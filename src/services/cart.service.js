@@ -2,9 +2,7 @@ const Cart = require("../models/cart.model");
 const productService = require("./product.service");
 
 const getCartByCustomerId = async (customerId) => {
-  const cart = await Cart.findOne({ customer: customerId }).populate(
-    "products.product"
-  );
+  const cart = await Cart.findOne({ customer: customerId }).populate("products.product");
 
   return cart;
 };

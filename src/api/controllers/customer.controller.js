@@ -40,6 +40,8 @@ const login = async (req, res, next) => {
           lName: customer.lName,
           email: customer.email,
           isNew: customer.isNewCustomer,
+          addresses: customer.addresses,
+          wishlist: customer.wishList
         },
       };
 
@@ -106,6 +108,8 @@ const getCustomer = async (req, res, next) => {
         lname: customer.lName,
         email: customer.email,
         isNew: customer.isNewCustomer,
+        addresses: customer.addresses,
+        wishlist: customer.wishList
       },
     };
 
@@ -115,8 +119,77 @@ const getCustomer = async (req, res, next) => {
   }
 };
 
+const addCustomerAddress = async (req, res, next) => {
+
+  const { addressDto } = req.body;
+  try {
+
+    if(!addressDto.fName || !addressDto.lName || !addressDto.phone || !addressDto.country || !addressDto.street || !addressDto.town || !addressDto.zip){
+      throw new HTTP403Error('Missing fields');
+    }
+
+    const customerInfo = req.decoded;
+
+    const updatedCustomer = await customerService.addCustomerAddress(customerInfo.id, addressDto);
+
+    return res.json(updatedCustomer.addresses.pop());
+  } catch(error) {
+    next(error);
+  }
+};
+
+const deleteAddress = async (req, res, next) => {
+  const id = req.params.id;
+
+  try {
+    const customerInfo = req.decoded;
+
+  //  {
+  //    throw new HTTP401Error("Not address delete");
+  //  }
+
+   if(!id) {
+    throw new HTTP403Error("Missing user id in the URL");
+   }
+
+   const result = await customerService.deleteCustomerAddress(customerInfo.id, id);
+   if(result) {
+     return res.json({deleted: true});
+   }
+   return res.json({deleted : false});
+  } catch(error) {
+    next(error);
+  }
+};
+
+const updateAddress = async (req, res, next) => {
+  const id = req.params.id;
+  const { addressDto } = req.body;
+
+  try {
+    if(!addressDto.fName || !addressDto.lName || !addressDto.phone || !addressDto.country || !addressDto.street || !addressDto.town || !addressDto.zip){
+      throw new HTTP403Error('Missing fields');
+    }
+
+    const customerInfo = req.decoded;
+
+    const result = await customerService.updateCustomerAddress(customerInfo.id, id, addressDto);
+
+    if(result) {
+      return res.json(result);
+    }
+    return res.json(null);
+
+  } catch(error) {
+    next(error);
+  }
+}
+
 module.exports = {
   login,
   signUpCustomer,
   getCustomer,
+  addCustomerAddress,
+  deleteAddress,
+  updateAddress
 };
