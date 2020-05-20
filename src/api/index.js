@@ -8,6 +8,9 @@ const staffMember = require("./routes/staff-member");
 const cart = require("./routes/cart");
 const product = require("./routes/product");
 const brand = require("./routes/brand");
+const category = require("./routes/category");
+const size = require("./routes/size");
+
 /** @description Register commonly used middleware
  * @param {Express.Application} app The radius of the circle.
  * @return {void}
@@ -33,6 +36,8 @@ exports.routes = () => {
   cart(router);
   product(router);
   brand(router);
+  category(router);
+  size(router);
 
   return router;
 };
