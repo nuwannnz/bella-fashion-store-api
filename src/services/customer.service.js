@@ -85,7 +85,7 @@ const updatePassword = async (id, newPassword) => {
   await customer.save();
 
   return true;
-}
+};
 
 const getIsNewCustomer = async (id) => {
   const customer = await Customer.findOne({ _id: id });
@@ -94,7 +94,7 @@ const getIsNewCustomer = async (id) => {
     return false;
   }
   return customer.isNewCustomer
-}
+};
 
 const getCustomerByEmail = async (email) => {
   const customer = await Customer.findOne({ email }).populate("wishList.product");
@@ -103,7 +103,7 @@ const getCustomerByEmail = async (email) => {
     return null;
   }
   return customer;
-}
+};
 
 const getCustomerById = async (id) => {
   const customer = await Customer.findOne( {_id: id} ).populate("wishList.product");
@@ -112,7 +112,7 @@ const getCustomerById = async (id) => {
     return null;
   }
   return customer;
-}
+};
 
 const addCustomerAddress = async (customerId, addressDto) => {
 
@@ -136,7 +136,7 @@ const addCustomerAddress = async (customerId, addressDto) => {
   await customer.save();
  
   return customer;
-}
+};
 
 const deleteCustomerAddress = async (customerId, addredssId) => {
   const customer = await Customer.findOne({_id: customerId});
@@ -152,7 +152,7 @@ const deleteCustomerAddress = async (customerId, addredssId) => {
   await customer.save();
 
   return true;
-}
+};
 
 const updateCustomerAddress = async (customerId, addressId, customerAddressDto) => {
   const customer = await getCustomerById(customerId);
@@ -179,7 +179,58 @@ const updateCustomerAddress = async (customerId, addressId, customerAddressDto) 
  await customer.save();
 
  return addressToUpdate;
-}
+};
+
+const updateCustomerInfo = async (id, newCustomerInfo) => {
+  console.log("Hi I'm API service");
+  console.log(id);
+  console.log(newCustomerInfo);
+  
+  
+  const customer = await Customer.findOne({ _id: id });
+  console.log(customer);
+  
+  if(!customer) {
+    return false;
+  }
+
+  customer.fName = newCustomerInfo.fName;
+  customer.lName = newCustomerInfo.lName;
+  customer.email = newCustomerInfo.email;
+
+  console.log("hi I'm api service");
+  console.log(customer);
+  
+
+  await customer.save();
+
+  return true;
+};
+
+const updateCustomerPassword = async (id, currentPwd, newPwd) => {
+  const customer = await getCustomerById(id);
+  console.log("Hi, I'm API service");
+  console.log(currentPwd);
+  console.log(newPwd);
+  
+  const passwordMatches = await bcrypt.compare(currentPwd, customer.password);
+  
+  console.log("Is match = " + passwordMatches);
+  
+
+  if(!passwordMatches) {
+    return false;
+  }
+
+  // hash passsword
+  const hashedPassword = await bcrypt.hash(newPwd, 10);
+
+  customer.password =hashedPassword;
+  
+  await customer.save();
+
+  return true;
+};
 
 module.exports = {
   login,
@@ -191,5 +242,7 @@ module.exports = {
   addCustomerAddress,
   deleteCustomerAddress,
   getCustomerById,
-  updateCustomerAddress
+  updateCustomerAddress,
+  updateCustomerInfo,
+  updateCustomerPassword
 };
