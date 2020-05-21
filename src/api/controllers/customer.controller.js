@@ -212,26 +212,20 @@ const updateCustomerInfo = async (req, res, next) => {
 };
 
 const updateCustomerPassword = async (req, res, next) => {
-  console.log("Hi, I'm API controller");
-  console.log(req.body);
+
   const { currentPwd, newPwd  } = req.body;
 
   try {
     // get info added by the customer token
     const customerInfo = req.decoded;
 
-    // if(!) {
-    //   throw new HTTP403Error("Password is not match current password.");
-    // }
-
     const result = await customerService.updateCustomerPassword(customerInfo.id, currentPwd, newPwd);
 
     if(result) {
       return res.json({success: true});
     } else {
-      res.json({success: false});
+      throw new HTTP403Error("Password is not match current password.");
     }
-    return res.json({success: false});
   } catch(error) {
     next(error);
   }
