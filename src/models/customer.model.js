@@ -53,7 +53,7 @@ const Customer = new mongoose.Schema(
         product: {
           type: mongoose.Types.ObjectId,
           ref: "Products"
-        }
+        },
       }],
     isNewCustomer: {
       type: Boolean,
