@@ -9,6 +9,8 @@ const createOrder = async (orderDto) => {
         createdOrder: null
     }
 
+    let newOrder = new Order();
+
     let totalValue = 0;
 
     // check product quantities
@@ -41,19 +43,20 @@ const createOrder = async (orderDto) => {
         await product.save();
 
         totalValue += product.price * item.qty;
+
+        newOrder.items.push({ ...item, product: product._id })
     }
 
-    const newOrder = new Order();
 
     newOrder.customer = orderDto.customer;
     newOrder.paymentMethod = orderDto.payment.paymentType;
-    newOrder.items = orderDto.itemList;
     newOrder.totalValue = totalValue;
+    newOrder.addressId = orderDto.addressId;
 
     await newOrder.save();
 
-    newOrder.populate('items.product');
-    result.createdOrder = newOrder;
+    const createdOrder = await Order.findOne({ _id: newOrder._id }).populate('items.product');
+    result.createdOrder = createdOrder;
     return result;
 }
 
