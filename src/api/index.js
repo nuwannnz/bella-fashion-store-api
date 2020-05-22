@@ -5,6 +5,8 @@ const commonMiddleware = require("./middleware/common");
 const errorHandlingMiddleware = require("./middleware/errorHanlders");
 const customer = require("./routes/customer");
 const staffMember = require("./routes/staff-member");
+const category = require("./routes/category");
+
 const cart = require("./routes/cart");
 const product = require("./routes/product");
 const brand = require("./routes/brand");
@@ -32,6 +34,7 @@ exports.routes = () => {
   // apply routes
   customer(router);
   staffMember(router);
+  category(router);
   cart(router);
   product(router);
   brand(router);
