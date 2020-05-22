@@ -12,9 +12,11 @@ module.exports = app => {
   route.post("/login", customerController.login);
   route.post("/signup", customerController.signUpCustomer);
   route.get("/", verifyJWTToken, customerController.getCustomer);
+  route.patch("/", verifyJWTToken, customerController.updateCustomerInfo);
+  route.patch("/pwd", verifyJWTToken, customerController.updateCustomerPassword);
 
   route.post("/address", verifyJWTToken, customerController.addCustomerAddress);
   route.delete("/address/:id", verifyJWTToken, customerController.deleteAddress);
   route.put("/address/:id", verifyJWTToken, customerController.updateAddress);
-
+  
 };
