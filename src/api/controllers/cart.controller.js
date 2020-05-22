@@ -71,6 +71,10 @@ const removeProductFromCart = async (req, res, next) => {
 
 const clearCart = async (req, res, next) => {
   try {
+    const customerInfo = req.decoded;
+    const result = await cartService.removeAllProductsFromCard(customerInfo.id);
+
+    return res.json({ success: result });
   } catch (error) {
     next(error);
   }

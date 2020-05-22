@@ -8,8 +8,10 @@ const staffMember = require("./routes/staff-member");
 const cart = require("./routes/cart");
 const product = require("./routes/product");
 const brand = require("./routes/brand");
+const order = require("./routes/order");
+
 /** @description Register commonly used middleware
- * @param {Express.Application} app The radius of the circle.
+ * @param {Express.Application} app 
  * @return {void}
  */
 const registerCommonMiddleware = (app) => {
@@ -33,6 +35,7 @@ exports.routes = () => {
   cart(router);
   product(router);
   brand(router);
+  order(router);
 
   return router;
 };
