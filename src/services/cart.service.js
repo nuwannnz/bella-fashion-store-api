@@ -82,9 +82,19 @@ const removeProductFromCart = async (customerId, productId, size) => {
   return true;
 };
 
+const removeAllProductsFromCard = async (customerId) => {
+  const customerCart = await getCartByCustomerId(customerId);
+
+  customerCart.products = [];
+
+  await customerCart.save();
+  return true;
+}
+
 module.exports = {
   getCartByCustomerId,
   createCart,
   addProductToCart,
   removeProductFromCart,
+  removeAllProductsFromCard
 };
