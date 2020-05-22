@@ -7,6 +7,10 @@ const Order = new mongoose.Schema(
             ref: "Customer",
             required: true,
         },
+        addressId: {
+            type: mongoose.Types.ObjectId,
+            required: true
+        },
         paymentMethod: {
             type: String,
             required: true
