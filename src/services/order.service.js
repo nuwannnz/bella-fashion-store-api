@@ -65,8 +65,30 @@ const getOrdersOfCustomer = async (customerId) => {
     return orders;
 }
 
+const getAllOrders = async () => {
+    const orders = await Order.find().populate('items.product').populate('customer');
+    return orders;
+}
+
+const updateOrderStatus = async (orderId, status) => {
+    const order = await Order.findOne({ _id: orderId });
+    order.isCompleted = status;
+
+    await order.save();
+
+    return order;
+}
+
+const deleteOrder = async (orderId) => {
+    const result = await Order.deleteOne({ _id: orderId });
+
+    return result.deletedCount && result.deletedCount === 1;
+}
 
 module.exports = {
     createOrder,
-    getOrdersOfCustomer
+    getOrdersOfCustomer,
+    getAllOrders,
+    updateOrderStatus,
+    deleteOrder
 }

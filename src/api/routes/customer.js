@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const customerController = require("../controllers/customer.controller");
+const orderController = require("../controllers/order.controller");
 const { verifyJWTToken } = require("../middleware/auth");
 
 // init express router
@@ -23,4 +24,7 @@ module.exports = app => {
   route.post("/wishlist/products", verifyJWTToken, customerController.addProductToWishlist);
   route.delete("/wishlist/products/:id", verifyJWTToken, customerController.removeProductFromWishlist);
   route.delete("/wishlist/products/", verifyJWTToken, customerController.clearWishlist);
+
+  route.get("/orders", verifyJWTToken, orderController.getAllOrdersOfCustomer)
+
 };

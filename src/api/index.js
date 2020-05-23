@@ -5,11 +5,11 @@ const commonMiddleware = require("./middleware/common");
 const errorHandlingMiddleware = require("./middleware/errorHanlders");
 const customer = require("./routes/customer");
 const staffMember = require("./routes/staff-member");
-const category = require("./routes/category");
-
 const cart = require("./routes/cart");
 const product = require("./routes/product");
 const brand = require("./routes/brand");
+const category = require("./routes/category");
+const size = require("./routes/size");
 const order = require("./routes/order");
 
 /** @description Register commonly used middleware
@@ -38,7 +38,9 @@ exports.routes = () => {
   cart(router);
   product(router);
   brand(router);
+  size(router);
   order(router);
+
 
   return router;
 };
