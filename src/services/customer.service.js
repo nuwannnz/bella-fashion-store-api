@@ -4,6 +4,7 @@ const generatePassword = require("generate-password");
 const { hashPassword } = require("../util");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
+const productService = require("./product.service");
 
 
 /**@description Check whether the given email and password combination is
@@ -106,7 +107,7 @@ const getCustomerByEmail = async (email) => {
 };
 
 const getCustomerById = async (id) => {
-  const customer = await Customer.findOne( {_id: id} ).populate("wishList.product");
+  const customer = await Customer.findOne( {_id: id} ).populate("wishList.product");;
 
   if(!customer) {
     return null;
@@ -232,6 +233,52 @@ const updateCustomerPassword = async (id, currentPwd, newPwd) => {
   return true;
 };
 
+const addProductToWishlist = async (wishlistItemDto) => {
+  const product = await productService.getProductsById(wishlistItemDto.product_id);
+
+  if(!product) {
+    return {
+      success: false,
+      msg: "Requested product is not available"
+    };
+  }
+
+  let wishlistOfCustomer = await getCustomerById(wishlistItemDto.customerId);
+  wishlistOfCustomer.wishList.push({
+    product: product._id,
+  });
+  
+  await wishlistOfCustomer.save();
+  const updatedWishlistOfCustomer = await getCustomerById(wishlistItemDto.customerId);
+  // updatedWishlistOfCustomer.populate('wishlist.product')
+
+  return {
+    success: true,
+    addedEntry: updatedWishlistOfCustomer.wishList.pop()
+  };
+};
+
+const removeProductFromWishlist = async (customerId, productId) => {
+  const customerWishlist = await getCustomerById(customerId);
+
+  customerWishlist.wishList = customerWishlist.wishList.filter((p) => {
+    p.product._id !== productId;
+  });
+
+  await customerWishlist.save();
+
+  return true;
+};
+
+const removeAllProductsFromWishlist = async (customerId) => {
+  const customerWishlist = await getCustomerById(customerId);
+
+  customerWishlist.products = [];
+
+  await customerWishlist.save();
+  return true;
+}
+
 module.exports = {
   login,
   signUp,
@@ -244,5 +291,8 @@ module.exports = {
   getCustomerById,
   updateCustomerAddress,
   updateCustomerInfo,
-  updateCustomerPassword
+  updateCustomerPassword,
+  removeProductFromWishlist,
+  addProductToWishlist,
+  removeAllProductsFromWishlist
 };

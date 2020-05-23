@@ -15,16 +15,15 @@ module.exports = (app) => {
   // non-auth routes
 
   //route.post("/admin/products/add", productController.addProducts);
-  route.post("/", multipleImageUpload, productController.addProducts);
+  route.post("/",verifyJWTToken, multipleImageUpload, productController.addProducts);
   route.get("/", productController.getAllProducts);
 
-  route.get("/:id", productController.getProductsByID);
 
   // // auth reqired routes
   // route.post("/", verifyJWTToken, staffController.addUser);
   // route.get("/info", verifyJWTToken, staffController.getInfo);
-  route.put("/", productController.updateProduct);
-  route.delete("/:id", productController.deleteProduct);
+  route.put("/", verifyJWTToken, multipleImageUpload,productController.updateProduct);
+  route.delete("/:id", verifyJWTToken, productController.deleteProduct);
 
 
 
