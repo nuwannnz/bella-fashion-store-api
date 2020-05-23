@@ -20,6 +20,8 @@ module.exports = app => {
   route.delete("/address/:id", verifyJWTToken, customerController.deleteAddress);
   route.put("/address/:id", verifyJWTToken, customerController.updateAddress);
 
-  route.get("/orders", verifyJWTToken, orderController.getAllOrdersOfCustomer)
+  route.get("/orders", verifyJWTToken, orderController.getAllOrdersOfCustomer);
+  route.get("/inquiry", );
+  route.post("/inquiry", );
 
 };

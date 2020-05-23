@@ -214,9 +214,6 @@ const updateCustomerPassword = async (id, currentPwd, newPwd) => {
   console.log(newPwd);
   
   const passwordMatches = await bcrypt.compare(currentPwd, customer.password);
-  
-  console.log("Is match = " + passwordMatches);
-  
 
   if(!passwordMatches) {
     return false;
