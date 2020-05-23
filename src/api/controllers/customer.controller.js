@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const config = require("../../config");
 const { emailUtil } = require("../../util");
 const { logger } = require("../../util");
+const bcrypt = require("bcrypt");
 
 /**@description Login the customer
  *
@@ -40,6 +41,8 @@ const login = async (req, res, next) => {
           lName: customer.lName,
           email: customer.email,
           isNew: customer.isNewCustomer,
+          addresses: customer.addresses,
+          wishlist: customer.wishList
         },
       };
 
@@ -103,9 +106,11 @@ const getCustomer = async (req, res, next) => {
       isAuth: true,
       customer: {
         fName: customer.fName,
-        lname: customer.lName,
+        lName: customer.lName,
         email: customer.email,
         isNew: customer.isNewCustomer,
+        addresses: customer.addresses,
+        wishlist: customer.wishList
       },
     };
 
@@ -115,8 +120,124 @@ const getCustomer = async (req, res, next) => {
   }
 };
 
+const addCustomerAddress = async (req, res, next) => {
+
+  const { addressDto } = req.body;
+  try {
+
+    if(!addressDto.fName || !addressDto.lName || !addressDto.phone || !addressDto.country || !addressDto.street || !addressDto.town || !addressDto.zip){
+      throw new HTTP403Error('Missing fields');
+    }
+
+    const customerInfo = req.decoded;
+
+    const updatedCustomer = await customerService.addCustomerAddress(customerInfo.id, addressDto);
+
+    return res.json(updatedCustomer.addresses.pop());
+  } catch(error) {
+    next(error);
+  }
+};
+
+const deleteAddress = async (req, res, next) => {
+  const id = req.params.id;
+
+  try {
+    const customerInfo = req.decoded;
+
+  //  {
+  //    throw new HTTP401Error("Not address delete");
+  //  }
+
+   if(!id) {
+    throw new HTTP403Error("Missing user id in the URL");
+   }
+
+   const result = await customerService.deleteCustomerAddress(customerInfo.id, id);
+   if(result) {
+     return res.json({deleted: true});
+   }
+   return res.json({deleted : false});
+  } catch(error) {
+    next(error);
+  }
+};
+
+const updateAddress = async (req, res, next) => {
+  const id = req.params.id;
+  const { addressDto } = req.body;
+
+  try {
+    if(!addressDto.fName || !addressDto.lName || !addressDto.phone || !addressDto.country || !addressDto.street || !addressDto.town || !addressDto.zip){
+      throw new HTTP403Error('Missing fields');
+    }
+
+    const customerInfo = req.decoded;
+
+    const result = await customerService.updateCustomerAddress(customerInfo.id, id, addressDto);
+
+    if(result) {
+      return res.json(result);
+    }
+    return res.json(null);
+
+  } catch(error) {
+    next(error);
+  }
+};
+
+const updateCustomerInfo = async (req, res, next) => {
+  const { customerInfoToUpdate } = req.body;
+
+  console.log("Hi I'm controller");
+  console.log(customerInfoToUpdate);
+  
+
+  try {
+    if(!customerInfoToUpdate.fName || !customerInfoToUpdate.lName || !customerInfoToUpdate.email) {
+      throw new HTTP403Error('Missing fields');
+    }
+
+    const customerInfo = req.decoded;
+
+    const result = await customerService.updateCustomerInfo(customerInfo.id, customerInfoToUpdate);
+
+    if(result) {
+      return res.json(customerInfoToUpdate);
+    }
+    return res.json(null);
+  } catch(error) {
+    next(error);
+  }
+};
+
+const updateCustomerPassword = async (req, res, next) => {
+
+  const { currentPwd, newPwd  } = req.body;
+
+  try {
+    // get info added by the customer token
+    const customerInfo = req.decoded;
+
+    const result = await customerService.updateCustomerPassword(customerInfo.id, currentPwd, newPwd);
+
+    if(result) {
+      return res.json({success: true});
+    } else {
+      throw new HTTP403Error("Password is not match current password.");
+    }
+  } catch(error) {
+    next(error);
+  }
+};
+
 module.exports = {
   login,
   signUpCustomer,
   getCustomer,
+  addCustomerAddress,
+  deleteAddress,
+  updateAddress,
+  updateCustomerInfo,
+  updateCustomerPassword
 };

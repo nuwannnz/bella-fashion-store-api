@@ -10,9 +10,10 @@ const product = require("./routes/product");
 const brand = require("./routes/brand");
 const category = require("./routes/category");
 const size = require("./routes/size");
+const order = require("./routes/order");
 
 /** @description Register commonly used middleware
- * @param {Express.Application} app The radius of the circle.
+ * @param {Express.Application} app 
  * @return {void}
  */
 const registerCommonMiddleware = (app) => {
@@ -33,11 +34,13 @@ exports.routes = () => {
   // apply routes
   customer(router);
   staffMember(router);
+  category(router);
   cart(router);
   product(router);
   brand(router);
-  category(router);
   size(router);
+  order(router);
+
 
   return router;
 };
