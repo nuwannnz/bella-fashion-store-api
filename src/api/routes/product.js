@@ -22,7 +22,7 @@ module.exports = (app) => {
   // // auth reqired routes
   // route.post("/", verifyJWTToken, staffController.addUser);
   // route.get("/info", verifyJWTToken, staffController.getInfo);
-  route.put("/", verifyJWTToken, productController.updateProduct);
+  route.put("/", verifyJWTToken, multipleImageUpload,productController.updateProduct);
   route.delete("/:id", verifyJWTToken, productController.deleteProduct);
 
 

@@ -68,6 +68,7 @@ const updateProduct = async (productDto) => {
   product.colors = productDto.colors;
   product.tags = productDto.tags;
   product.description = productDto.description;
+  product.images = productDto.imageUrls
   product.updatedDate = new Date();
 
 

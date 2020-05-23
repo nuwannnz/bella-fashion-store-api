@@ -131,6 +131,18 @@ const updateProduct = async (req, res, next) => {
       throw new HTTP403Error("Details are required");
     }
 
+          // extract image files
+      const imageFiles = req.files;
+      const imageUrls = [];
+
+      // upload images to AWS and retrive URLs
+      for (let i = 0; i < imageFiles.length; i++) {
+        const image = imageFiles[i];
+        const imageUrl = await uploadImageToAWS(image);
+
+        imageUrls.push(imageUrl);
+      }
+
 
       if (
         !(await roleService.hasPermission(
@@ -152,7 +164,8 @@ const updateProduct = async (req, res, next) => {
         discount,
         colors,
         tags,
-        description
+        description,
+        imageUrls
       });
 
 
