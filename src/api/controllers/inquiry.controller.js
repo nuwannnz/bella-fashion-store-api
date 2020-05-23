@@ -1,0 +1,103 @@
+const inquiryService = require("../../services/inquiry.service");
+const staffService = require("../../services/staff.service");
+const roleService = require("../../services/role.service");
+const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
+const jwt = require("jsonwebtoken");
+const config = require("../../config");
+const { logger, emailUtil } = require("../../util");
+
+const addInquiry = async (req, res, next) => {
+  const { inquiryDto } = req.body;
+
+  try {
+    if (
+      !inquiryDto.name ||
+      !inquiryDto.email ||
+      !inquiryDto.phone ||
+      !inquiryDto.subject ||
+      !inquiryDto.description
+    ) {
+      throw new HTTP403Error("Missing fields");
+    }
+
+    const result = await inquiryService.addInquiry(inquiryDto);
+
+    if (result) {
+      return res.json(result);
+    }
+    return res.json(null);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getInquiry = async (req, res, next) => {
+  try {
+    const userInfo = req.decoded;
+    if (
+      !(await roleService.hasPermission(
+        await staffService.getRoleOfStaffMember(userInfo.id),
+        roleService.Permissions.inquiry,
+        roleService.PermissionModes.read
+      ))
+    ) {
+      // no permission
+      throw new HTTP401Error("Not authorized");
+    }
+
+    const inquiry = await inquiryService.getAllInquries();
+
+    return res.json(inquiry);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const replyToInquiry = async (req, res, next) => {
+  const { replyInquiryDto } = req.body;
+
+  try {
+    const userInfo = req.decoded;
+    if (
+      !(await roleService.hasPermission(
+        await staffService.getRoleOfStaffMember(userInfo.id),
+        roleService.Permissions.inquiry,
+        roleService.PermissionModes.write
+      ))
+    ) {
+      // no permission
+      throw new HTTP401Error("Not authorized");
+    }
+
+    if (
+      !replyInquiryDto.inquiryId ||
+      !replyInquiryDto.subject ||
+      !replyInquiryDto.description
+    ) {
+      throw new HTTP403Error("Missing fields");
+    }
+
+    const inquiry = await inquiryService.getInquiryById(
+      replyInquiryDto.inquiryId
+    );
+
+    await emailUtil.sendInquiryReplyMsg(
+      inquiry.email,
+      inquiry.name,
+      replyInquiryDto.subject,
+      replyInquiryDto.description
+    );
+
+    await inquiryService.markAsReplied(replyInquiryDto.inquiryId);
+
+    return res.json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  addInquiry,
+  getInquiry,
+  replyToInquiry,
+};

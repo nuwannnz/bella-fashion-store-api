@@ -2,6 +2,18 @@ const mongoose = require("mongoose");
 
 const Inquiry = new mongoose.Schema(
     {
+        name: {
+            type: String,
+            required: true
+        },
+        email: {
+            type: String,
+            required: true
+        },
+        phone: {
+            type: String,
+            required: true
+        },
         subject: {
             type: String,
             required: true
@@ -9,8 +21,16 @@ const Inquiry = new mongoose.Schema(
         description: {
             type: String,
             required: true
-        }
+        },
+        replied: {
+            type: Boolean,
+            default:false,
+          },
+    },
+    
+    {
+        timestamps: true,
     }
 );
 
-module.export = mongoose.model("Inquiry", Inquiry);
+module.exports = mongoose.model("Inquiry", Inquiry);

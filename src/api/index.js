@@ -11,6 +11,7 @@ const cart = require("./routes/cart");
 const product = require("./routes/product");
 const brand = require("./routes/brand");
 const order = require("./routes/order");
+const inquiry = require("./routes/inquiry");
 
 /** @description Register commonly used middleware
  * @param {Express.Application} app 
@@ -39,6 +40,7 @@ exports.routes = () => {
   product(router);
   brand(router);
   order(router);
+  inquiry(router);
 
   return router;
 };
