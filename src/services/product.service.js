@@ -21,10 +21,10 @@ const addProduct = async (productDto) => {
   const addedRecord = await newProduct.save();
 
   if (addedRecord) {
-    return { success: true };
+    return { success: true, addedEntry: addedRecord };
   }
 
-  return { success: false };
+  return { success: false, addedEntry: null  };
 };
 
 const getProducts = async () => {
@@ -68,6 +68,7 @@ const updateProduct = async (productDto) => {
   product.colors = productDto.colors;
   product.tags = productDto.tags;
   product.description = productDto.description;
+  product.images = productDto.imageUrls
   product.updatedDate = new Date();
 
 
@@ -78,23 +79,20 @@ const updateProduct = async (productDto) => {
 }
 
 const deleteProductById = async (_id) => {
+
   const product = await Products.findOne({ _id });
+  
+    if (!product) {
+      return false;
+    }
 
-
-
-
-  if (!product) {
-    return null;
+    await product.remove();
+    return true;
   }
 
-  await product.remove();
-  return true;
-}
-
-module.exports = {
-  addProduct,
-  getProducts,
-  getProductsById,
-  updateProduct,
-  deleteProductById
-};
+  module.exports = {
+    addProduct,
+    getProducts,
+    updateProduct,
+    deleteProductById
+  }
