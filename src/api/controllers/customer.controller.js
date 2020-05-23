@@ -37,6 +37,7 @@ const login = async (req, res, next) => {
         isAuth: true,
         token,
         customer: {
+          id: customer._id,
           fName: customer.fName,
           lName: customer.lName,
           email: customer.email,
@@ -105,6 +106,7 @@ const getCustomer = async (req, res, next) => {
     const result = {
       isAuth: true,
       customer: {
+        id: customer._id,
         fName: customer.fName,
         lName: customer.lName,
         email: customer.email,
@@ -125,7 +127,7 @@ const addCustomerAddress = async (req, res, next) => {
   const { addressDto } = req.body;
   try {
 
-    if(!addressDto.fName || !addressDto.lName || !addressDto.phone || !addressDto.country || !addressDto.street || !addressDto.town || !addressDto.zip){
+    if (!addressDto.fName || !addressDto.lName || !addressDto.phone || !addressDto.country || !addressDto.street || !addressDto.town || !addressDto.zip) {
       throw new HTTP403Error('Missing fields');
     }
 
@@ -134,7 +136,7 @@ const addCustomerAddress = async (req, res, next) => {
     const updatedCustomer = await customerService.addCustomerAddress(customerInfo.id, addressDto);
 
     return res.json(updatedCustomer.addresses.pop());
-  } catch(error) {
+  } catch (error) {
     next(error);
   }
 };
@@ -145,20 +147,20 @@ const deleteAddress = async (req, res, next) => {
   try {
     const customerInfo = req.decoded;
 
-  //  {
-  //    throw new HTTP401Error("Not address delete");
-  //  }
+    //  {
+    //    throw new HTTP401Error("Not address delete");
+    //  }
 
-   if(!id) {
-    throw new HTTP403Error("Missing user id in the URL");
-   }
+    if (!id) {
+      throw new HTTP403Error("Missing user id in the URL");
+    }
 
-   const result = await customerService.deleteCustomerAddress(customerInfo.id, id);
-   if(result) {
-     return res.json({deleted: true});
-   }
-   return res.json({deleted : false});
-  } catch(error) {
+    const result = await customerService.deleteCustomerAddress(customerInfo.id, id);
+    if (result) {
+      return res.json({ deleted: true });
+    }
+    return res.json({ deleted: false });
+  } catch (error) {
     next(error);
   }
 };
@@ -168,7 +170,7 @@ const updateAddress = async (req, res, next) => {
   const { addressDto } = req.body;
 
   try {
-    if(!addressDto.fName || !addressDto.lName || !addressDto.phone || !addressDto.country || !addressDto.street || !addressDto.town || !addressDto.zip){
+    if (!addressDto.fName || !addressDto.lName || !addressDto.phone || !addressDto.country || !addressDto.street || !addressDto.town || !addressDto.zip) {
       throw new HTTP403Error('Missing fields');
     }
 
@@ -176,12 +178,12 @@ const updateAddress = async (req, res, next) => {
 
     const result = await customerService.updateCustomerAddress(customerInfo.id, id, addressDto);
 
-    if(result) {
+    if (result) {
       return res.json(result);
     }
     return res.json(null);
 
-  } catch(error) {
+  } catch (error) {
     next(error);
   }
 };
@@ -191,10 +193,10 @@ const updateCustomerInfo = async (req, res, next) => {
 
   console.log("Hi I'm controller");
   console.log(customerInfoToUpdate);
-  
+
 
   try {
-    if(!customerInfoToUpdate.fName || !customerInfoToUpdate.lName || !customerInfoToUpdate.email) {
+    if (!customerInfoToUpdate.fName || !customerInfoToUpdate.lName || !customerInfoToUpdate.email) {
       throw new HTTP403Error('Missing fields');
     }
 
@@ -202,18 +204,18 @@ const updateCustomerInfo = async (req, res, next) => {
 
     const result = await customerService.updateCustomerInfo(customerInfo.id, customerInfoToUpdate);
 
-    if(result) {
+    if (result) {
       return res.json(customerInfoToUpdate);
     }
     return res.json(null);
-  } catch(error) {
+  } catch (error) {
     next(error);
   }
 };
 
 const updateCustomerPassword = async (req, res, next) => {
 
-  const { currentPwd, newPwd  } = req.body;
+  const { currentPwd, newPwd } = req.body;
 
   try {
     // get info added by the customer token
@@ -221,12 +223,12 @@ const updateCustomerPassword = async (req, res, next) => {
 
     const result = await customerService.updateCustomerPassword(customerInfo.id, currentPwd, newPwd);
 
-    if(result) {
-      return res.json({success: true});
+    if (result) {
+      return res.json({ success: true });
     } else {
       throw new HTTP403Error("Password is not match current password.");
     }
-  } catch(error) {
+  } catch (error) {
     next(error);
   }
 };
@@ -237,7 +239,7 @@ const getWishlist = async (req, res, next) => {
     const wishlist = await customerService.getCustomerById(customerInfo.id);
 
     return res.json(wishlist);
-  } catch(error) {
+  } catch (error) {
     next(error);
   }
 };
@@ -246,7 +248,7 @@ const addProductToWishlist = async (req, res, next) => {
   const { product_id } = req.body;
 
   try {
-    if(!product_id) {
+    if (!product_id) {
       throw new HTTP403Error("Missing information");
     }
 
@@ -258,7 +260,7 @@ const addProductToWishlist = async (req, res, next) => {
     });
 
     return res.json(result);
-  } catch(error) {
+  } catch (error) {
     next(error);
   }
 };
@@ -267,7 +269,7 @@ const removeProductFromWishlist = async (req, res, next) => {
   const productId = req.params.id;
 
   try {
-    if(!productId) {
+    if (!productId) {
       throw new HTTP403Error("Missing information");
     }
 
@@ -278,12 +280,12 @@ const removeProductFromWishlist = async (req, res, next) => {
       productId
     );
 
-    if(result) {
-      return res.json({success: true });
+    if (result) {
+      return res.json({ success: true });
     } else {
-      return res.json({success: false });
+      return res.json({ success: false });
     }
-  } catch(error) {
+  } catch (error) {
     next(error);
   }
 };
@@ -294,7 +296,7 @@ const clearWishlist = async (req, res, next) => {
     const result = await customerService.removeProductFromWishlist(customerInfo.id);
 
     return res.json({ success: result });
-  } catch(error) {
+  } catch (error) {
     next(error);
   }
 };
