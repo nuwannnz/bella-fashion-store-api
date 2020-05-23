@@ -1,11 +1,8 @@
 const Customer = require("../models/customer.model");
-const roleService = require("./role.service");
-const generatePassword = require("generate-password");
 const { hashPassword } = require("../util");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const productService = require("./product.service");
-
 
 /**@description Check whether the given email and password combination is
  * correct
@@ -16,28 +13,27 @@ const productService = require("./product.service");
  */
 const login = async (email, password) => {
   const result = {
-    isAuth: false
+    isAuth: false,
   };
   const customer = await Customer.findOne({ email });
-  if(!customer) {
+  if (!customer) {
     return result;
   }
 
   const passwordMatches = await bcrypt.compare(password, customer.password);
 
-  if(passwordMatches) {
+  if (passwordMatches) {
     result.isAuth = true;
 
-    if(customer.isNewCustomer) {
+    if (customer.isNewCustomer) {
       customer.isNewCustomer = false;
       await customer.save();
-    } 
-   
+    }
+
     return result;
   } else {
     return result;
   }
-
 };
 
 const signUp = async (customerDto) => {
@@ -53,28 +49,29 @@ const signUp = async (customerDto) => {
 
   const addedRecord = await newCustomer.save();
 
-  if(addedRecord) {
+  if (addedRecord) {
     return {
       success: true,
-      password: pwd
+      password: pwd,
     };
   }
   return {
-    success: false, 
-    password: pwd
+    success: false,
+    password: pwd,
   };
-  
 };
 
 const emailExist = async (email) => {
-  const customerCountWithEmail = await Customer.find({ email }).countDocuments();
+  const customerCountWithEmail = await Customer.find({
+    email,
+  }).countDocuments();
   return customerCountWithEmail !== 0;
 };
 
 const updatePassword = async (id, newPassword) => {
   const customer = await Customer.findOne({ _id: id });
 
-  if(!customer) {
+  if (!customer) {
     return false;
   }
   // Hash customer password
@@ -91,75 +88,81 @@ const updatePassword = async (id, newPassword) => {
 const getIsNewCustomer = async (id) => {
   const customer = await Customer.findOne({ _id: id });
 
-  if(!customer) {
+  if (!customer) {
     return false;
   }
-  return customer.isNewCustomer
+  return customer.isNewCustomer;
 };
 
 const getCustomerByEmail = async (email) => {
-  const customer = await Customer.findOne({ email }).populate("wishList.product");
+  const customer = await Customer.findOne({ email }).populate(
+    "wishList.product"
+  );
 
-  if(!customer) {
+  if (!customer) {
     return null;
   }
   return customer;
 };
 
 const getCustomerById = async (id) => {
-  const customer = await Customer.findOne( {_id: id} ).populate("wishList.product");;
+  const customer = await Customer.findOne({ _id: id }).populate(
+    "wishList.product"
+  );
 
-  if(!customer) {
+  if (!customer) {
     return null;
   }
   return customer;
 };
 
 const addCustomerAddress = async (customerId, addressDto) => {
-
-  const customer = await Customer.findOne({_id:customerId});
+  const customer = await Customer.findOne({ _id: customerId });
 
   const newAddress = {
-
-    fName : addressDto.fName,
-    lName : addressDto.lName,
-    phone : addressDto.phone,
-    country : addressDto.country,
-    street : addressDto.street,
-    town : addressDto.town,
-    zip : addressDto.zip
-
-  }
+    fName: addressDto.fName,
+    lName: addressDto.lName,
+    phone: addressDto.phone,
+    country: addressDto.country,
+    street: addressDto.street,
+    town: addressDto.town,
+    zip: addressDto.zip,
+  };
 
   customer.addresses.push(newAddress);
-  
-  
+
   await customer.save();
- 
+
   return customer;
 };
 
 const deleteCustomerAddress = async (customerId, addredssId) => {
-  const customer = await Customer.findOne({_id: customerId});
+  const customer = await Customer.findOne({ _id: customerId });
   addredssId = mongoose.Types.ObjectId(addredssId);
-  customer.addresses = customer.addresses.filter(addr => {
-    if(addr._id.equals(addredssId)) {
+  customer.addresses = customer.addresses.filter((addr) => {
+    if (addr._id.equals(addredssId)) {
       return false;
     } else {
       return true;
     }
-  })
+  });
 
   await customer.save();
 
   return true;
 };
 
-const updateCustomerAddress = async (customerId, addressId, customerAddressDto) => {
+const updateCustomerAddress = async (
+  customerId,
+  addressId,
+  customerAddressDto
+) => {
   const customer = await getCustomerById(customerId);
   addressId = mongoose.Types.ObjectId(addressId);
 
-  const addressToUpdate = await customer.addresses.find((addr) => addr._id.equals(addressId));
+  const addressToUpdate = await customer.addresses.find((addr) =>
+    addr._id.equals(addressId)
+  );
 
   addressToUpdate.fName = customerAddressDto.fName;
   addressToUpdate.lName = customerAddressDto.lName;
@@ -169,29 +172,27 @@ const updateCustomerAddress = async (customerId, addressId, customerAddressDto) 
   addressToUpdate.town = customerAddressDto.town;
   addressToUpdate.zip = customerAddressDto.zip;
 
+  customer.addresses = customer.addresses.map((addr) => {
+    if (addr._id.equals(addressId)) {
+      return addressToUpdate;
+    }
+    return addr;
+  });
 
- customer.addresses = customer.addresses.map((addr) => {
-   if(addr._id.equals(addressId)){
-     return addressToUpdate;
-   }
-   return addr;
- })
+  await customer.save();
 
- await customer.save();
-
- return addressToUpdate;
+  return addressToUpdate;
 };
 
 const updateCustomerInfo = async (id, newCustomerInfo) => {
   console.log("Hi I'm API service");
   console.log(id);
   console.log(newCustomerInfo);
-  
-  
+
   const customer = await Customer.findOne({ _id: id });
   console.log(customer);
-  
-  if(!customer) {
+
+  if (!customer) {
     return false;
   }
 
@@ -201,7 +202,6 @@ const updateCustomerInfo = async (id, newCustomerInfo) => {
 
   console.log("hi I'm api service");
   console.log(customer);
-  
 
   await customer.save();
 
@@ -213,30 +213,32 @@ const updateCustomerPassword = async (id, currentPwd, newPwd) => {
   console.log("Hi, I'm API service");
   console.log(currentPwd);
   console.log(newPwd);
-  
+
   const passwordMatches = await bcrypt.compare(currentPwd, customer.password);
 
-  if(!passwordMatches) {
+  if (!passwordMatches) {
     return false;
   }
 
   // hash passsword
   const hashedPassword = await bcrypt.hash(newPwd, 10);
 
-  customer.password =hashedPassword;
-  
+  customer.password = hashedPassword;
+
   await customer.save();
 
   return true;
 };
 
 const addProductToWishlist = async (wishlistItemDto) => {
-  const product = await productService.getProductsById(wishlistItemDto.product_id);
+  const product = await productService.getProductsById(
+    wishlistItemDto.product_id
+  );
 
-  if(!product) {
+  if (!product) {
     return {
       success: false,
-      msg: "Requested product is not available"
+      msg: "Requested product is not available",
     };
   }
 
@@ -244,14 +246,16 @@ const addProductToWishlist = async (wishlistItemDto) => {
   wishlistOfCustomer.wishList.push({
     product: product._id,
   });
-  
+
   await wishlistOfCustomer.save();
-  const updatedWishlistOfCustomer = await getCustomerById(wishlistItemDto.customerId);
+  const updatedWishlistOfCustomer = await getCustomerById(
+    wishlistItemDto.customerId
+  );
   // updatedWishlistOfCustomer.populate('wishlist.product')
 
   return {
     success: true,
-    addedEntry: updatedWishlistOfCustomer.wishList.pop()
+    addedEntry: updatedWishlistOfCustomer.wishList.pop(),
   };
 };
 
@@ -274,7 +278,7 @@ const removeAllProductsFromWishlist = async (customerId) => {
 
   await customerWishlist.save();
   return true;
-}
+};
 
 module.exports = {
   login,
@@ -291,5 +295,5 @@ module.exports = {
   updateCustomerPassword,
   removeProductFromWishlist,
   addProductToWishlist,
-  removeAllProductsFromWishlist
+  removeAllProductsFromWishlist,
 };
