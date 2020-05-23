@@ -50,7 +50,7 @@ const getAllOrders = async (req, res, next) => {
 }
 
 const updateOrderStatus = async (req, res, next) => {
-    const orderId = req.params;
+    const orderId = req.params.orderId;
     const { orderStatus } = req.body;
     try {
 
@@ -69,9 +69,28 @@ const updateOrderStatus = async (req, res, next) => {
     }
 }
 
+const deleteOrder = async (req, res, next) => {
+    const orderId = req.params.orderId;
+    try {
+        if (!orderId) {
+            throw new HTTP403Error('Missing fields')
+        }
+
+        // check permission
+
+        const result = await orderService.deleteOrder(orderId);
+
+        res.json({ success: result });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     createOrder,
     getAllOrdersOfCustomer,
     getAllOrders,
-    updateOrderStatus
+    updateOrderStatus,
+    deleteOrder
 }

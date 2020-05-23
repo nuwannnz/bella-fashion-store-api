@@ -79,9 +79,16 @@ const updateOrderStatus = async (orderId, status) => {
     return order;
 }
 
+const deleteOrder = async (orderId) => {
+    const result = await Order.deleteOne({ _id: orderId });
+
+    return result.deletedCount && result.deletedCount === 1;
+}
+
 module.exports = {
     createOrder,
     getOrdersOfCustomer,
     getAllOrders,
-    updateOrderStatus
+    updateOrderStatus,
+    deleteOrder
 }

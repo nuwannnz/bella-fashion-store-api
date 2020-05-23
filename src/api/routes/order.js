@@ -18,6 +18,9 @@ module.exports = (app) => {
     // update order status
     route.patch("/:orderId", verifyJWTToken, orderController.updateOrderStatus);
 
+    // delete order 
+    route.delete("/:orderId", verifyJWTToken, orderController.deleteOrder);
+
 
 
 };
