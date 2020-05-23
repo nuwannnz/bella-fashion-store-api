@@ -1,23 +1,46 @@
 const productService = require("../../services/product.service");
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
-const { uploadImageToAWS } = require('../../util/awsUploader')
+const roleService = require("../../services/role.service");
+const staffService = require("../../services/staff.service");
+const {uploadImageToAWS} = require('../../util/awsUploader');
+
+
 
 const addProducts = async (req, res, next) => {
   console.log(req.body);
-  const {
-    name,
-    sizeQty,
-    brand,
-    category,
-    subCategory,
-    price,
-    discount,
-    colors,
-    tags,
-    description
-  } = req.body;
+    const {
+        name,
+        sizeQty,
+        brand,
+        category,
+        subCategory,
+        price,
+        discount,
+        colors,
+        tags,
+        description
+     } = req.body;
 
+     
+  
+    try {
+      if (!name || !sizeQty || !brand || !category || !subCategory || !price || !discount || !colors || !tags || !description) {
+        // missing fields
+        throw new HTTP403Error("Details are required");
+      }
+      
+      const userInfo = req.decoded;
 
+      if (
+        !(await roleService.hasPermission(
+          await staffService.getRoleOfStaffMember(userInfo.id),
+          roleService.Permissions.product,
+          roleService.PermissionModes.write
+        ))){
+          throw new HTTP401Error("Unauthorized");
+        }
+
+        
   // extract image files
   const imageFiles = req.files;
   const imageUrls = [];
@@ -30,72 +53,42 @@ const addProducts = async (req, res, next) => {
     imageUrls.push(imageUrl);
   }
 
-
-
-  try {
-    if (!name || !sizeQty || !brand || !category || !subCategory || !price || !discount || !colors || !tags || !description) {
-      // missing fields
-      throw new HTTP403Error("Details are required");
+      const result = await productService.addProduct({
+        name,
+        sizeQty: JSON.parse(sizeQty),
+        brand,
+        category,
+        subCategory,
+        price,
+        discount,
+        colors,
+        tags,
+        description,
+        imageUrls
+      });
+      
+      return res.json(result);
+    } catch (error) {
+      next(error);
     }
+  };
 
-    const result = await productService.addProduct({
-      name,
-      sizeQty: JSON.parse(sizeQty),
-      brand,
-      category,
-      subCategory,
-      price,
-      discount,
-      colors,
-      tags,
-      description,
-      imageUrls
-    });
-    if (result.success) {
-      res.json({ success: true });
-    } else {
-      res.json({ success: false });
+  const getAllProducts = async (req, res, next) => {
+
+    try {
+      const productInfo = req.decoded;
+  
+      const product = await productService.getProducts();
+  
+      if (!product) {
+        throw new HTTP401Error("Unauthorized");
+      }
+  
+      res.json(product);
+    } catch (error) {
+      next(error)
     }
-  } catch (error) {
-    next(error);
   }
-};
-
-const getAllProducts = async (req, res, next) => {
-
-  try {
-    const productInfo = req.decoded;
-
-    const product = await productService.getProducts();
-
-    if (!product) {
-      throw new HTTP401Error("Unauthorized");
-    }
-
-    res.json(product);
-  } catch (error) {
-    next(error)
-  }
-}
-
-const getProductsByID = async (req, res, next) => {
-
-  try {
-    const productInfo = req.params.id
-
-
-
-    const product = await productService.getProductsById(productInfo);
-
-    if (!product) {
-      throw new HTTP401Error("Unauthorized");
-    }
-
-    res.json(product);
-  } catch (error) {
-    next(error)
-  }
-}
 
 const updateProduct = async (req, res, next) => {
   const {
@@ -138,57 +131,93 @@ const updateProduct = async (req, res, next) => {
       throw new HTTP403Error("Details are required");
     }
 
-    const result = await productService.updateProduct({
-      _id,
-      name,
-      sizeQty,
-      brand,
-      category,
-      subCategory,
-      price,
-      discount,
-      colors,
-      tags,
-      description
-    });
+          // extract image files
+      const imageFiles = req.files;
+      const imageUrls = [];
 
-    if (result) {
-      res.json({
-        success: true
-      })
-    } else {
+      // upload images to AWS and retrive URLs
+      for (let i = 0; i < imageFiles.length; i++) {
+        const image = imageFiles[i];
+        const imageUrl = await uploadImageToAWS(image);
 
-      res.json({
-        success: false
-      })
+        imageUrls.push(imageUrl);
+      }
+
+
+      if (
+        !(await roleService.hasPermission(
+          await staffService.getRoleOfStaffMember(userInfo.id),
+          roleService.Permissions.product,
+          roleService.PermissionModes.write
+        ))){
+          throw new HTTP401Error("Unauthorized");
+        }
+  
+      const result = await productService.updateProduct({
+        _id,
+        name,
+        sizeQty,
+        brand,
+        category,
+        subCategory,
+        price,
+        discount,
+        colors,
+        tags,
+        description,
+        imageUrls
+      });
+
+
+      console.log(result)
+      console.log(result)
+  
+      return res.json(result)
+  
+    } catch (error) {
+      next(error);
     }
 
-  } catch (error) {
-    next(error);
-  }
 }
 
-const deleteProduct = async (req, res, next) => {
+  const deleteProduct = async (req, res, next) => {
 
-  try {
-    const productInfo = req.params.id
+    try {
+      const productInfo = req.params.id
 
-    const product = await productService.deleteProductById(productInfo);
+      const userInfo = req.decoded;
 
-    if (!product) {
-      throw new HTTP401Error("Unauthorized");
+      if (
+        !(await roleService.hasPermission(
+          await staffService.getRoleOfStaffMember(userInfo.id),
+          roleService.Permissions.product,
+          roleService.PermissionModes.write
+        ))){
+          throw new HTTP401Error("Unauthorized");
+        }
+  
+      const product = await productService.deleteProductById(productInfo);
+      
+      console.log(product)
+      if (!product) {
+        throw new HTTP401Error("Unauthorized");
+      }
+      
+      if (product) {
+        return res.json({ success: true });
+      } else {
+        return res.json({ success: false });
+      }
+    } catch (error) {
+      next(error)
     }
 
-    res.json(product);
-  } catch (error) {
-    next(error)
-  }
+  
 }
 
-module.exports = {
-  addProducts,
-  getAllProducts,
-  getProductsByID,
-  updateProduct,
-  deleteProduct
-};
+  module.exports = {
+    addProducts,
+    getAllProducts,
+    updateProduct,
+    deleteProduct
+  }

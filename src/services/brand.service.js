@@ -3,16 +3,18 @@ const Brands = require("../models/brand.model");
 const addBrand = async (brandDto) => {
     const newBrand = new Brands();
     newBrand.name = brandDto.name;
+    newBrand.images = brandDto.imageUrls;
     newBrand.addedDate = new Date();
 
+    console.log(newBrand.images)
   
     const addedRecord = await newBrand.save();
   
-    if (addedRecord) {
-      return { success: true };
+    if (!addedRecord) {
+      return { succeded: false, addedEntry: null };
     }
   
-    return { success: false};
+    return { succeded: true, addedEntry: addedRecord};
   };
 
   const getBrands = async () => {
@@ -25,12 +27,15 @@ const addBrand = async (brandDto) => {
     return brand;
   }
 
-  const deleteBrandById = async (_id) => {
-    const brand = await Products.findOne({ _id });
+  const deletebrandById = async (_id) => {
+    const brand = await Brands.findOne({_id});
+    
   
     if (!brand) {
       return null;
     }
+
+  
 
     await brand.remove();
     return true;
@@ -39,5 +44,5 @@ const addBrand = async (brandDto) => {
   module.exports = {
     addBrand,
     getBrands,
-    deleteBrandById
+    deletebrandById
   };

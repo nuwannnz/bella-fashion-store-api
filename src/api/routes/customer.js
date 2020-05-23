@@ -20,8 +20,17 @@ module.exports = app => {
   route.delete("/address/:id", verifyJWTToken, customerController.deleteAddress);
   route.put("/address/:id", verifyJWTToken, customerController.updateAddress);
 
+<<<<<<< HEAD
   route.get("/orders", verifyJWTToken, orderController.getAllOrdersOfCustomer);
   route.get("/inquiry", );
   route.post("/inquiry", );
+=======
+  route.get("/wishlist", verifyJWTToken, customerController.getWishlist);
+  route.post("/wishlist/products", verifyJWTToken, customerController.addProductToWishlist);
+  route.delete("/wishlist/products/:id", verifyJWTToken, customerController.removeProductFromWishlist);
+  route.delete("/wishlist/products/", verifyJWTToken, customerController.clearWishlist);
+
+  route.get("/orders", verifyJWTToken, orderController.getAllOrdersOfCustomer)
+>>>>>>> 88dc54cb31f7f8609078fe09d2899dac628ca5ca
 
 };

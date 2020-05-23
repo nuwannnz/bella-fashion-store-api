@@ -1,41 +1,24 @@
-const brandService = require("../../services/brand.service");
+const sizeService = require("../../services/size.service");
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 const roleService = require("../../services/role.service");
 const staffService = require("../../services/staff.service");
-const {uploadImageToAWS} = require('../../util/awsUploader');
 
-const addBrands = async (req, res, next) => {
+const addSizes = async (req, res, next) => {
     console.log(req.body);
-      const {name} = req.body;
+      const {name, description} = req.body;
   
-       console.log(name)
+    console.log(name, description)
     
       try {
-        if (!name) {
+        if (!name || !description) {
           // missing fields
           throw new HTTP403Error("Details are required");
         }
 
         const userInfo = req.decoded;
 
-          // extract image files
-        const imageFiles = req.files;
-        const imageUrls = [];
-
-        console.log(imageFiles)
-
-        for (let i = 0; i < imageFiles.length; i++) {
-          const image = imageFiles[i];
-          const imageUrl = await uploadImageToAWS(image);
       
-          imageUrls.push(imageUrl);
-        }
-
-        console.log(imageUrls)
-      
-        const result = await brandService.addBrand({name, imageUrls});
-
-        console.log(result)
+        const result = await sizeService.addSize({name, description});
        
         return res.json(result);
       } catch (error) {
@@ -43,29 +26,29 @@ const addBrands = async (req, res, next) => {
       }
     };
 
-    const getAllBrands = async (req, res, next) => {
+    const getAllSizes = async (req, res, next) => {
 
         try {
-          const brandInfo = req.decoded;
+          const sizeInfo = req.decoded;
       
-          const brand = await brandService.getBrands();
+          const Size = await sizeService.getSizes();
       
-          if (!brand) {
+          if (!Size) {
             throw new HTTP401Error("Unauthorized");
           }
       
-          res.json(brand);
+          res.json(Size);
         } catch (error) {
           next(error)
         }
       }
 
-      const deleteBrands = async (req, res, next) => {
+      const deleteSizes = async (req, res, next) => {
 
         try {
 
-          const brandInfo = req.params.id
-          console.log(brandInfo)
+          const sizeInfo = req.params.id
+          console.log(sizeInfo)
           userInfo = req.decoded
 
           
@@ -78,13 +61,12 @@ const addBrands = async (req, res, next) => {
       //     throw new HTTP401Error("Unauthorized");
       //   }
 
-          const brand = await brandService.deletebrandById(brandInfo);
-      console.log(brand)
-          if (!brand) {
+          const Size = await sizeService.deleteSizeById(sizeInfo);
+          if (!Size) {
             throw new HTTP401Error("Unauthorized");
           }
       
-          if (brand) {
+          if (Size) {
             return res.json({ success: true });
           } else {
             return res.json({ success: false });
@@ -95,8 +77,8 @@ const addBrands = async (req, res, next) => {
       }
     
       module.exports = {
-        addBrands,
-        getAllBrands,
-        deleteBrands
+        addSizes,
+        getAllSizes,
+        deleteSizes
       };
     
