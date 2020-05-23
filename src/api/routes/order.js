@@ -11,7 +11,13 @@ module.exports = (app) => {
     // checkout cart
     route.post("/", verifyJWTToken, orderController.createOrder);
 
-    // get orders
+    // get all orders
     route.get("/", verifyJWTToken, orderController.getAllOrders);
+
+
+    // update order status
+    route.patch("/:orderId", verifyJWTToken, orderController.updateOrderStatus);
+
+
 
 };

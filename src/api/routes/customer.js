@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const customerController = require("../controllers/customer.controller");
+const orderController = require("../controllers/order.controller");
 const { verifyJWTToken } = require("../middleware/auth");
 
 // init express router
@@ -18,5 +19,7 @@ module.exports = app => {
   route.post("/address", verifyJWTToken, customerController.addCustomerAddress);
   route.delete("/address/:id", verifyJWTToken, customerController.deleteAddress);
   route.put("/address/:id", verifyJWTToken, customerController.updateAddress);
-  
+
+  route.get("/orders", verifyJWTToken, orderController.getAllOrdersOfCustomer)
+
 };
