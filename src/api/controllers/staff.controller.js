@@ -3,7 +3,7 @@ const roleService = require("../../services/role.service");
 const { HTTP403Error, HTTP401Error } = require("../../util/httpErrors");
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
-const { logger, email: emailUtil } = require("../../util");
+const { logger, emailUtil } = require("../../util");
 
 /**@description Login the staff member
  *
@@ -351,7 +351,7 @@ const getAllRoles = async (req, res, next) => {
     const userInfo = req.decoded;
     const user = await staffService.getStaffMemberById(userInfo.id);
 
-    if (!(await roleService.isAdimnRole(user.role))) {
+    if (!(await roleService.isAdimnRole(user.role._id))) {
       throw new HTTP401Error("Unauthorized");
     }
 
