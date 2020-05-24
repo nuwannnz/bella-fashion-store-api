@@ -137,12 +137,15 @@ const updateProduct = async (req, res, next) => {
       const imageFiles = req.files;
       const imageUrls = [];
 
-      // upload images to AWS and retrive URLs
-      for (let i = 0; i < imageFiles.length; i++) {
-        const image = imageFiles[i];
-        const imageUrl = await uploadImageToAWS(image);
+      if(imageFiles){
 
-        imageUrls.push(imageUrl);
+        // upload images to AWS and retrive URLs
+        for (let i = 0; i < imageFiles.length; i++) {
+          const image = imageFiles[i];
+          const imageUrl = await uploadImageToAWS(image);
+          
+          imageUrls.push(imageUrl);
+        }
       }
 
       

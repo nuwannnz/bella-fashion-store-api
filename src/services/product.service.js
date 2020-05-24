@@ -56,8 +56,9 @@ const updateProduct = async (productDto) => {
   console.log(product._id);
 
   product.name = productDto.name;
-  product.sizeQty = productDto.sizeQty;
-  product.brand = productD.brand;
+
+  product.sizeQty = JSON.parse(productDto.sizeQty);
+  product.brand = productDto.brand
   product.category = productDto.category;
   product.subCategory = productDto.subCategory;
   product.price = productDto.price;
@@ -65,13 +66,24 @@ const updateProduct = async (productDto) => {
   product.colors = productDto.colors;
   product.tags = productDto.tags;
   product.description = productDto.description;
-  product.images = productDto.imageUrls;
+
+  if(productDto.imageUrls.length > 0){
+    product.images = productDto.imageUrls
+
+
   product.updatedDate = new Date();
 
   await product.save();
 
-  return true;
-};
+
+  if (!product) {
+    return null;
+  }
+
+  return product;
+
+}
+
 
 const deleteProductById = async (_id) => {
   const product = await Products.findOne({ _id });
