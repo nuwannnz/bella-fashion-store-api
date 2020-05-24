@@ -263,75 +263,75 @@ const updateCustomerPassword = async (req, res, next) => {
   }
 };
 
-const getWishlist = async (req, res, next) => {
-  try {
-    const customerInfo = req.decoded;
-    const wishlist = await customerService.getCustomerById(customerInfo.id);
+// const getWishlist = async (req, res, next) => {
+//   try {
+//     const customerInfo = req.decoded;
+//     const wishlist = await customerService.getCustomerById(customerInfo.id);
 
-    return res.json(wishlist);
-  } catch (error) {
-    next(error);
-  }
-};
+//     return res.json(wishlist);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
-const addProductToWishlist = async (req, res, next) => {
-  const { product_id } = req.body;
+// const addProductToWishlist = async (req, res, next) => {
+//   const { product_id } = req.body;
 
-  try {
-    if (!product_id) {
-      throw new HTTP403Error("Missing information");
-    }
+//   try {
+//     if (!product_id) {
+//       throw new HTTP403Error("Missing information");
+//     }
 
-    const customerInfo = req.decoded;
+//     const customerInfo = req.decoded;
 
-    const result = await customerService.addProductToWishlist({
-      customerId: customerInfo.id,
-      product_id,
-    });
+//     const result = await customerService.addProductToWishlist({
+//       customerId: customerInfo.id,
+//       product_id,
+//     });
 
-    return res.json(result);
-  } catch (error) {
-    next(error);
-  }
-};
+//     return res.json(result);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
-const removeProductFromWishlist = async (req, res, next) => {
-  const productId = req.params.id;
+// const removeProductFromWishlist = async (req, res, next) => {
+//   const productId = req.params.id;
 
-  try {
-    if (!productId) {
-      throw new HTTP403Error("Missing information");
-    }
+//   try {
+//     if (!productId) {
+//       throw new HTTP403Error("Missing information");
+//     }
 
-    const customerInfo = req.decoded;
+//     const customerInfo = req.decoded;
 
-    const result = await customerService.removeProductFromWishlist(
-      customerInfo.id,
-      productId
-    );
+//     const result = await customerService.removeProductFromWishlist(
+//       customerInfo.id,
+//       productId
+//     );
 
-    if (result) {
-      return res.json({ success: true });
-    } else {
-      return res.json({ success: false });
-    }
-  } catch (error) {
-    next(error);
-  }
-};
+//     if (result) {
+//       return res.json({ success: true });
+//     } else {
+//       return res.json({ success: false });
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
-const clearWishlist = async (req, res, next) => {
-  try {
-    const customerInfo = req.decoded;
-    const result = await customerService.removeProductFromWishlist(
-      customerInfo.id
-    );
+// const clearWishlist = async (req, res, next) => {
+//   try {
+//     const customerInfo = req.decoded;
+//     const result = await customerService.removeProductFromWishlist(
+//       customerInfo.id
+//     );
 
-    return res.json({ success: result });
-  } catch (error) {
-    next(error);
-  }
-};
+//     return res.json({ success: result });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 const getWishlist = async (req, res, next) => {
   try {

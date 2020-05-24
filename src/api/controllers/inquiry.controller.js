@@ -54,7 +54,7 @@ const getInquiry = async (req, res, next) => {
 };
 
 const replyToInquiry = async (req, res, next) => {
-  const { replyInquiryDto } = req.body;
+  const { replyDto } = req.body;
 
   try {
     const userInfo = req.decoded;
@@ -69,26 +69,20 @@ const replyToInquiry = async (req, res, next) => {
       throw new HTTP401Error("Not authorized");
     }
 
-    if (
-      !replyInquiryDto.inquiryId ||
-      !replyInquiryDto.subject ||
-      !replyInquiryDto.description
-    ) {
+    if (!replyDto.inquiryId || !replyDto.subject || !replyDto.description) {
       throw new HTTP403Error("Missing fields");
     }
 
-    const inquiry = await inquiryService.getInquiryById(
-      replyInquiryDto.inquiryId
-    );
+    const inquiry = await inquiryService.getInquiryById(replyDto.inquiryId);
 
     await emailUtil.sendInquiryReplyMsg(
       inquiry.email,
       inquiry.name,
-      replyInquiryDto.subject,
-      replyInquiryDto.description
+      replyDto.subject,
+      replyDto.description
     );
 
-    await inquiryService.markAsReplied(replyInquiryDto.inquiryId);
+    await inquiryService.markAsReplied(replyDto.inquiryId);
 
     return res.json({ success: true });
   } catch (error) {

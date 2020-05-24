@@ -39,7 +39,22 @@ const sendInquiryReplyMsg = async (to, name, subject, description) => {
     dynamic_template_data: {
       name,
       subject,
-      description
+      description,
+    },
+  };
+
+  await sgMail.send(msg);
+};
+
+const sendPasswordResetCode = async (to, fName, code) => {
+  sgMail.setApiKey(config.SEND_GRID_KEY);
+  const msg = {
+    to,
+    from: config.email.mainAddr,
+    templateId: "d-d35784decd044a03950d5b5e0827a3d6",
+    dynamic_template_data: {
+      fName,
+      code,
     },
   };
 
@@ -49,5 +64,6 @@ const sendInquiryReplyMsg = async (to, name, subject, description) => {
 exports.email = {
   sendStaffTempPasswordMsg,
   sendCustomerJoiningMsg,
-  sendInquiryReplyMsg
+  sendInquiryReplyMsg,
+  sendPasswordResetCode,
 };

@@ -1,8 +1,8 @@
 const Customer = require("../models/customer.model");
-const { hashPassword } = require("../util");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const productService = require("./product.service");
+const { generatePassword, hashPassword } = require("../util/password");
 
 /**@description Check whether the given email and password combination is
  * correct
@@ -280,6 +280,33 @@ const removeAllProductsFromWishlist = async (customerId) => {
   return true;
 };
 
+const generateForgotPassword = async (customerId) => {
+  const customer = await getCustomerById(customerId);
+
+  const tempCode = generatePassword();
+
+  // hash the password
+  const hashedCode = await hashPassword(tempCode);
+
+  customer.passwordResetCode = hashedCode;
+
+  await customer.save();
+
+  return tempCode;
+};
+
+const checkCode = async (customerId, code) => {
+  const customer = await getCustomerById(customerId);
+
+  const codeMatches = await bcrypt.compare(code, customer.passwordResetCode);
+
+  if (codeMatches) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 module.exports = {
   login,
   signUp,
@@ -296,4 +323,6 @@ module.exports = {
   removeProductFromWishlist,
   addProductToWishlist,
   removeAllProductsFromWishlist,
+  generateForgotPassword,
+  checkCode,
 };
