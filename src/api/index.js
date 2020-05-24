@@ -13,6 +13,7 @@ const category = require("./routes/category");
 const size = require("./routes/size");
 const order = require("./routes/order");
 const review = require("./routes/product-review");
+const homepage = require("./routes/homepage");
 
 /** @description Register commonly used middleware
  * @param {Express.Application} app 
@@ -43,6 +44,7 @@ exports.routes = () => {
   size(router);
   order(router);
   review(router);
+  homepage(router);
 
 
   return router;

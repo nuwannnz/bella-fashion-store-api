@@ -1,4 +1,5 @@
 const Role = require('./role.model');
+const Homepage = require('./hompage.model')
 const { logger } = require('../util')
 
 const roleSeeds = async () => {
@@ -47,10 +48,19 @@ const roleSeeds = async () => {
     await adminRole.save();
 }
 
+const homepageSeed = async () => {
+    let homepageCount = await Homepage.countDocuments();
+    if (homepageCount === 0) {
+        // create default homepage
+        const homepage = new Homepage();
+        await homepage.save();
+    }
+}
 
 
 const runSeeds = async () => {
     await roleSeeds();
+    await homepageSeed();
 }
 
 module.exports = {
