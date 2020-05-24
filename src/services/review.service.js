@@ -13,7 +13,7 @@ const createReview = async (reviewDto) => {
     }
 
     await review.save();
-    let createdReview = review.populate('customer')
+    const createdReview = await ProductReview.findOne({ _id: review._id }).populate('customer', 'fName lName');
 
     return createdReview;
 
@@ -29,12 +29,31 @@ const updateReview = async (reviewDto) => {
 }
 
 const deleteReview = async (reviewId) => {
+    const result = await ProductReview.deleteOne({ _id: reviewId });
 
+    return result.deletedCount && result.deletedCount === 1;
+
+}
+
+const upVoteReview = async (reviewId) => {
+    const review = await ProductReview.findOne({ _id: reviewId });
+    review.upVotes = review.upVotes + 1;
+    await review.save();
+    return true;
+}
+
+const downVoteReview = async (reviewId) => {
+    const review = await ProductReview.findOne({ _id: reviewId });
+    review.downVotes = review.downVotes + 1;
+    await review.save();
+    return true;
 }
 
 module.exports = {
     createReview,
     getReviewsByProductId,
     updateReview,
-    deleteReview
+    deleteReview,
+    upVoteReview,
+    downVoteReview
 }

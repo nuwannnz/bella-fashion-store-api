@@ -14,7 +14,11 @@ const size = require("./routes/size");
 const order = require("./routes/order");
 const inquiry = require("./routes/inquiry");
 const review = require("./routes/product-review");
+
 const forgotPwd = require("./routes/forgot-pwd");
+
+const homepage = require("./routes/homepage");
+
 
 /** @description Register commonly used middleware
  * @param {Express.Application} app
@@ -46,7 +50,12 @@ exports.routes = () => {
   order(router);
   inquiry(router);
   review(router);
+
   forgotPwd(router);
+
+  homepage(router);
+
+
 
   return router;
 };
