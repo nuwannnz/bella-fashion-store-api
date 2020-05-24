@@ -15,8 +15,7 @@ const addProduct = async (productDto) => {
   newProduct.tags = productDto.tags;
   newProduct.description = productDto.description;
   newProduct.addedDate = new Date();
-  newProduct.images = productDto.imageUrls
-
+  newProduct.images = productDto.imageUrls;
 
   const addedRecord = await newProduct.save();
 
@@ -28,26 +27,24 @@ const addProduct = async (productDto) => {
 };
 
 const getProducts = async () => {
-  const product = await Products.find()
-
-  if (!product) {
-    return null
-  }
-
-  return product;
-}
-
-const getProductsById = async (_id) => {
-  const product = await Products.findOne({ _id });
-
-
+  const product = await Products.find();
 
   if (!product) {
     return null;
   }
 
   return product;
-}
+};
+
+const getProductsById = async (_id) => {
+  const product = await Products.findOne({ _id });
+
+  if (!product) {
+    return null;
+  }
+
+  return product;
+};
 
 const updateProduct = async (productDto) => {
   const product = await Products.findOne({ _id: productDto._id });
@@ -59,6 +56,7 @@ const updateProduct = async (productDto) => {
   console.log(product._id);
 
   product.name = productDto.name;
+
   product.sizeQty = JSON.parse(productDto.sizeQty);
   product.brand = productDto.brand
   product.category = productDto.category;
@@ -72,11 +70,11 @@ const updateProduct = async (productDto) => {
   if(productDto.imageUrls.length > 0){
     product.images = productDto.imageUrls
 
-  }
+
   product.updatedDate = new Date();
 
-
   await product.save();
+
 
   if (!product) {
     return null;
@@ -86,8 +84,8 @@ const updateProduct = async (productDto) => {
 
 }
 
-const deleteProductById = async (_id) => {
 
+const deleteProductById = async (_id) => {
   const product = await Products.findOne({ _id });
 
   if (!product) {
@@ -96,12 +94,12 @@ const deleteProductById = async (_id) => {
 
   await product.remove();
   return true;
-}
+};
 
 module.exports = {
   addProduct,
   getProducts,
   updateProduct,
   deleteProductById,
-  getProductsById
-}
+  getProductsById,
+};

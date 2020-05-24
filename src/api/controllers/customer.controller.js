@@ -43,7 +43,7 @@ const login = async (req, res, next) => {
           email: customer.email,
           isNew: customer.isNewCustomer,
           addresses: customer.addresses,
-          wishlist: customer.wishList
+          wishlist: customer.wishList,
         },
       };
 
@@ -112,7 +112,7 @@ const getCustomer = async (req, res, next) => {
         email: customer.email,
         isNew: customer.isNewCustomer,
         addresses: customer.addresses,
-        wishlist: customer.wishList
+        wishlist: customer.wishList,
       },
     };
 
@@ -123,17 +123,28 @@ const getCustomer = async (req, res, next) => {
 };
 
 const addCustomerAddress = async (req, res, next) => {
-
   const { addressDto } = req.body;
   try {
 
-    if (!addressDto.fName || !addressDto.lName || !addressDto.phone || !addressDto.country || !addressDto.street || !addressDto.town || !addressDto.zip) {
-      throw new HTTP403Error('Missing fields');
+    if (
+      !addressDto.fName ||
+      !addressDto.lName ||
+      !addressDto.phone ||
+      !addressDto.country ||
+      !addressDto.street ||
+      !addressDto.town ||
+      !addressDto.zip
+    ) {
+      throw new HTTP403Error("Missing fields");
+
     }
 
     const customerInfo = req.decoded;
 
-    const updatedCustomer = await customerService.addCustomerAddress(customerInfo.id, addressDto);
+    const updatedCustomer = await customerService.addCustomerAddress(
+      customerInfo.id,
+      addressDto
+    );
 
     return res.json(updatedCustomer.addresses.pop());
   } catch (error) {
@@ -155,7 +166,12 @@ const deleteAddress = async (req, res, next) => {
       throw new HTTP403Error("Missing user id in the URL");
     }
 
-    const result = await customerService.deleteCustomerAddress(customerInfo.id, id);
+
+    const result = await customerService.deleteCustomerAddress(
+      customerInfo.id,
+      id
+    );
+
     if (result) {
       return res.json({ deleted: true });
     }
@@ -170,13 +186,27 @@ const updateAddress = async (req, res, next) => {
   const { addressDto } = req.body;
 
   try {
-    if (!addressDto.fName || !addressDto.lName || !addressDto.phone || !addressDto.country || !addressDto.street || !addressDto.town || !addressDto.zip) {
-      throw new HTTP403Error('Missing fields');
+
+    if (
+      !addressDto.fName ||
+      !addressDto.lName ||
+      !addressDto.phone ||
+      !addressDto.country ||
+      !addressDto.street ||
+      !addressDto.town ||
+      !addressDto.zip
+    ) {
+      throw new HTTP403Error("Missing fields");
+
     }
 
     const customerInfo = req.decoded;
 
-    const result = await customerService.updateCustomerAddress(customerInfo.id, id, addressDto);
+    const result = await customerService.updateCustomerAddress(
+      customerInfo.id,
+      id,
+      addressDto
+    );
 
     if (result) {
       return res.json(result);
@@ -194,15 +224,22 @@ const updateCustomerInfo = async (req, res, next) => {
   console.log("Hi I'm controller");
   console.log(customerInfoToUpdate);
 
-
   try {
-    if (!customerInfoToUpdate.fName || !customerInfoToUpdate.lName || !customerInfoToUpdate.email) {
-      throw new HTTP403Error('Missing fields');
+    if (
+      !customerInfoToUpdate.fName ||
+      !customerInfoToUpdate.lName ||
+      !customerInfoToUpdate.email
+    ) {
+      throw new HTTP403Error("Missing fields");
+
     }
 
     const customerInfo = req.decoded;
 
-    const result = await customerService.updateCustomerInfo(customerInfo.id, customerInfoToUpdate);
+    const result = await customerService.updateCustomerInfo(
+      customerInfo.id,
+      customerInfoToUpdate
+    );
 
     if (result) {
       return res.json(customerInfoToUpdate);
@@ -221,7 +258,11 @@ const updateCustomerPassword = async (req, res, next) => {
     // get info added by the customer token
     const customerInfo = req.decoded;
 
-    const result = await customerService.updateCustomerPassword(customerInfo.id, currentPwd, newPwd);
+    const result = await customerService.updateCustomerPassword(
+      customerInfo.id,
+      currentPwd,
+      newPwd
+    );
 
     if (result) {
       return res.json({ success: true });
@@ -232,6 +273,76 @@ const updateCustomerPassword = async (req, res, next) => {
     next(error);
   }
 };
+
+// const getWishlist = async (req, res, next) => {
+//   try {
+//     const customerInfo = req.decoded;
+//     const wishlist = await customerService.getCustomerById(customerInfo.id);
+
+//     return res.json(wishlist);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// const addProductToWishlist = async (req, res, next) => {
+//   const { product_id } = req.body;
+
+//   try {
+//     if (!product_id) {
+//       throw new HTTP403Error("Missing information");
+//     }
+
+//     const customerInfo = req.decoded;
+
+//     const result = await customerService.addProductToWishlist({
+//       customerId: customerInfo.id,
+//       product_id,
+//     });
+
+//     return res.json(result);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// const removeProductFromWishlist = async (req, res, next) => {
+//   const productId = req.params.id;
+
+//   try {
+//     if (!productId) {
+//       throw new HTTP403Error("Missing information");
+//     }
+
+//     const customerInfo = req.decoded;
+
+//     const result = await customerService.removeProductFromWishlist(
+//       customerInfo.id,
+//       productId
+//     );
+
+//     if (result) {
+//       return res.json({ success: true });
+//     } else {
+//       return res.json({ success: false });
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// const clearWishlist = async (req, res, next) => {
+//   try {
+//     const customerInfo = req.decoded;
+//     const result = await customerService.removeProductFromWishlist(
+//       customerInfo.id
+//     );
+
+//     return res.json({ success: result });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 const getWishlist = async (req, res, next) => {
   try {
@@ -256,7 +367,7 @@ const addProductToWishlist = async (req, res, next) => {
 
     const result = await customerService.addProductToWishlist({
       customerId: customerInfo.id,
-      product_id
+      product_id,
     });
 
     return res.json(result);
@@ -293,7 +404,9 @@ const removeProductFromWishlist = async (req, res, next) => {
 const clearWishlist = async (req, res, next) => {
   try {
     const customerInfo = req.decoded;
-    const result = await customerService.removeProductFromWishlist(customerInfo.id);
+    const result = await customerService.removeProductFromWishlist(
+      customerInfo.id
+    );
 
     return res.json({ success: result });
   } catch (error) {
@@ -313,5 +426,5 @@ module.exports = {
   getWishlist,
   addProductToWishlist,
   removeProductFromWishlist,
-  clearWishlist
+  clearWishlist,
 };
