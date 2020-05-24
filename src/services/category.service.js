@@ -1,4 +1,6 @@
 const Category = require('../models/category.model');
+const mongoose = require("mongoose");
+
 
 
 const getCategory= async () => {
@@ -34,7 +36,7 @@ const updateCategory = async (categoryId,updatedCategoryName) => {
   
     await category.save();
   
-    return true;
+    return category;
   
   }
 
@@ -53,7 +55,7 @@ const updateCategory = async (categoryId,updatedCategoryName) => {
    })
     
     await category.save();
-    return true;
+    return category;
   }
 
   const deleteCategory = async(id) => {
@@ -72,16 +74,18 @@ const updateCategory = async (categoryId,updatedCategoryName) => {
 
   const deleteSubCategory = async(id,sbid) => {
     const category = await Category.findOne({ _id: id });
-    const subCat = category.subcategory.find(sub => sub._id === sbid);
+    sbid = mongoose.Types.ObjectId(sbid)
+    const subCat = category.subcategory.find(sub => sub._id.equals(sbid));
 
     if (!subCat) {
       return false;
     }
-    category.subCat = category.subCat.filter(subCat => subCat._id !== sbid);
+    
+    category.subcategory = category.subcategory.filter(sCat => !sCat._id.equals(sbid));
    // cat.subcategory = cat.subcategory.filter(subCat => subCat._id !== 2)
    
     await category.save();
-    return true;
+    return category.subcategory;
   }
   
   

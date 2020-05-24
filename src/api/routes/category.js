@@ -16,12 +16,12 @@ module.exports = (app) => {
   route.get('/',categoriesController.getCategory);
 
   route.put('/',categoriesController.updateCategory);
+  route.delete('/:catId/:subCatId',categoriesController.deleteSubCategory);
   route.delete('/:id',categoriesController.deleteCategory);
-  route.delete('/:catId/:subCatId',categoriesController.deleteCategory);
+  
 
 
   route.post('/subcategory',categoriesController.newSubCategory);
-
   route.put('/subcategory', categoriesController.updateSubCategory);
 
 

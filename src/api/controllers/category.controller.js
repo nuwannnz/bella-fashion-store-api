@@ -94,9 +94,7 @@ const getCategory= async (req, res, next ) => {
       const result = await categoryService.updateCategory(categoryId,updatedCategoryName);
   
       if (result) {
-        return res.json({
-          success: true
-        })
+        return res.json(result)
       } else {
         res.json({
           success: false
@@ -117,12 +115,10 @@ const getCategory= async (req, res, next ) => {
         throw new HTTP403Error('Please add a name for new Sub-Category');
       }
   
-      const result = await categoryService.updateCategory(id, sbid, newCategoryName);
+      const result = await categoryService.updateSubCategory(id, sbid, newSubcategoryName);
   
       if (result) {
-        return res.json({
-          success: true
-        })
+        return res.json(result)
       } else {
         res.json({
           success: false
@@ -158,7 +154,8 @@ const getCategory= async (req, res, next ) => {
   }
 
   const deleteSubCategory =  async(req, res, next) => {
-    const {id,sbid} = req.body;
+    const id = req.params.catId;
+    const sbid = req.params.subCatId;
     try{
       if (sbid == null) {
         throw new HTTP403Error('Something Wrong with Sub-category ID');
@@ -187,7 +184,8 @@ const getCategory= async (req, res, next ) => {
     newSubCategory,
     updateCategory,
     updateSubCategory,
-    deleteCategory
+    deleteCategory,
+    deleteSubCategory
 
   };
   
