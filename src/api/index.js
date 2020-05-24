@@ -54,7 +54,6 @@ exports.routes = () => {
   forgotPwd(router);
   homepage(router);
 
-  homepage(router);
 
 
 
