@@ -8,4 +8,5 @@ module.exports = (app) => {
 
   route.post("/step-1", forgotPwdController.checkEmailStep);
   route.post("/step-2", forgotPwdController.checkCodeStep);
+  route.post("/step-3", forgotPwdController.updateCustomerForgotPassword);
 };

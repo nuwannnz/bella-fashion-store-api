@@ -307,6 +307,18 @@ const checkCode = async (customerId, code) => {
   }
 };
 
+const updateForgotPassword = async (email, newPwd) => {
+  const customer = await getCustomerByEmail(email);
+
+  const hashedPassword = await bcrypt.hash(newPwd, 10);
+
+  customer.password = hashedPassword;
+
+  await customer.save();
+
+  return true;
+};
+
 module.exports = {
   login,
   signUp,
@@ -325,4 +337,5 @@ module.exports = {
   removeAllProductsFromWishlist,
   generateForgotPassword,
   checkCode,
+  updateForgotPassword,
 };

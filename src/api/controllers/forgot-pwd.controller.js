@@ -54,7 +54,24 @@ const checkCodeStep = async (req, res, next) => {
   }
 };
 
+const updateCustomerForgotPassword = async (req, res, next) => {
+  const { email, newPwd } = req.body;
+
+  try {
+    const result = await customerService.updateForgotPassword(email, newPwd);
+
+    if (result) {
+      return res.json({ success: true });
+    } else {
+      throw new HTTP403Error("Password is not match to confirm password.");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   checkEmailStep,
   checkCodeStep,
+  updateCustomerForgotPassword,
 };
