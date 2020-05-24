@@ -249,7 +249,7 @@ const getAllUsers = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   const id = req.params.id;
-  const { email, fName, lName, role } = req.body;
+  const { email, fName, lName, roleId } = req.body;
 
   try {
     const userInfo = req.decoded;
@@ -273,7 +273,7 @@ const updateUser = async (req, res, next) => {
       fName,
       lName,
       email,
-      role,
+      roleId,
     });
 
     if (result.tempPassword) {
@@ -329,18 +329,18 @@ const addRole = async (req, res, next) => {
   const userInfo = req.decoded;
   const user = await staffService.getStaffMemberById(userInfo.id);
 
-  if (!(await roleService.isAdimnRole(user.role))) {
-    throw new HTTP401Error("Unauthorized");
-  }
 
   try {
+    if (!(await roleService.isAdimnRole(user.role._id))) {
+      throw new HTTP401Error("Unauthorized");
+    }
     if (!role || !roleService.validateRole(role)) {
       // invalid role object
       throw new HTTP403Error("Missing or invalid fields in the role");
     }
 
-    await roleService.createRole(role);
-    return res.json({ success: true });
+    const result = await roleService.createRole(role);
+    return res.json(result);
   } catch (error) {
     next(error);
   }
@@ -380,7 +380,7 @@ const updateRole = async (req, res, next) => {
     const userInfo = req.decoded;
     const user = await staffService.getStaffMemberById(userInfo.id);
 
-    if (!(await roleService.isAdimnRole(user.role))) {
+    if (!(await roleService.isAdimnRole(user.role._id))) {
       throw new HTTP401Error("Unauthorized");
     }
 
@@ -393,7 +393,7 @@ const updateRole = async (req, res, next) => {
       throw new HTTP403Error("Invalid role format");
     }
 
-    const updatedRole = await roleService.deleteRole(
+    const updatedRole = await roleService.updateRole(
       roleId,
       role.name,
       role.permissions
@@ -411,7 +411,7 @@ const deleteRole = async (req, res, next) => {
     const userInfo = req.decoded;
     const user = await staffService.getStaffMemberById(userInfo.id);
 
-    if (!(await roleService.isAdimnRole(user.role))) {
+    if (!(await roleService.isAdimnRole(user.role._id))) {
       throw new HTTP401Error("Unauthorized");
     }
 

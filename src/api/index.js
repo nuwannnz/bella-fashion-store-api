@@ -12,10 +12,16 @@ const brand = require("./routes/brand");
 const category = require("./routes/category");
 const size = require("./routes/size");
 const order = require("./routes/order");
+const inquiry = require("./routes/inquiry");
 const review = require("./routes/product-review");
 
+const forgotPwd = require("./routes/forgot-pwd");
+const homepage = require("./routes/homepage");
+
+
+
 /** @description Register commonly used middleware
- * @param {Express.Application} app 
+ * @param {Express.Application} app
  * @return {void}
  */
 const registerCommonMiddleware = (app) => {
@@ -42,7 +48,13 @@ exports.routes = () => {
   brand(router);
   size(router);
   order(router);
+  inquiry(router);
   review(router);
+
+  forgotPwd(router);
+  homepage(router);
+
+
 
 
   return router;

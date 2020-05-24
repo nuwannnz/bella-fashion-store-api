@@ -4,65 +4,72 @@ const Customer = new mongoose.Schema(
   {
     fName: {
       type: String,
-      required: true
+      required: true,
     },
     lName: {
       type: String,
-      required: true
+      required: true,
     },
     email: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
     password: {
       type: String,
-      required: true
+      required: true,
     },
-    addresses: [{
-      fName: {
-        type: String,
-        required: true
+    addresses: [
+      {
+        fName: {
+          type: String,
+          required: true,
+        },
+        lName: {
+          type: String,
+          required: true,
+        },
+        phone: {
+          type: String,
+          required: true,
+        },
+        country: {
+          type: String,
+          required: true,
+        },
+        street: {
+          type: String,
+          required: true,
+        },
+        town: {
+          type: String,
+          required: true,
+        },
+        zip: {
+          type: String,
+          required: true,
+        },
       },
-      lName: {
-        type: String,
-        required: true
-      },
-      phone: {
-        type: String,
-        required: true
-      },
-      country: {
-        type: String,
-        required: true
-      },
-      street: {
-        type: String,
-        required: true
-      },
-      town: {
-        type: String,
-        required: true
-      },
-      zip: {
-        type: String,
-        required: true
-      }
-    }],
-      wishList: [{
+    ],
+    wishList: [
+      {
         product: {
           type: mongoose.Types.ObjectId,
-          ref: "Products"
+          ref: "Products",
         },
-      }],
+      },
+    ],
     isNewCustomer: {
       type: Boolean,
-      default: true
+      default: true,
     },
-    lastLogin: Date
+    passwordResetCode: {
+      type: String,
+    },
+    lastLogin: Date,
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 

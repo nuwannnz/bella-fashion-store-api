@@ -15,8 +15,7 @@ const addProduct = async (productDto) => {
   newProduct.tags = productDto.tags;
   newProduct.description = productDto.description;
   newProduct.addedDate = new Date();
-  newProduct.images = productDto.imageUrls
-
+  newProduct.images = productDto.imageUrls;
 
   const addedRecord = await newProduct.save();
 
@@ -28,26 +27,24 @@ const addProduct = async (productDto) => {
 };
 
 const getProducts = async () => {
-  const product = await Products.find()
-
-  if (!product) {
-    return null
-  }
-
-  return product;
-}
-
-const getProductsById = async (_id) => {
-  const product = await Products.findOne({ _id });
-
-
+  const product = await Products.find();
 
   if (!product) {
     return null;
   }
 
   return product;
-}
+};
+
+const getProductsById = async (_id) => {
+  const product = await Products.findOne({ _id });
+
+  if (!product) {
+    return null;
+  }
+
+  return product;
+};
 
 const updateProduct = async (productDto) => {
   const product = await Products.findOne({ _id: productDto._id });
@@ -59,8 +56,9 @@ const updateProduct = async (productDto) => {
   console.log(product._id);
 
   product.name = productDto.name;
-  product.sizeQty = productDto.sizeQty;
-  product.brand = productD.brand
+
+  product.sizeQty = JSON.parse(productDto.sizeQty);
+  product.brand = productDto.brand
   product.category = productDto.category;
   product.subCategory = productDto.subCategory;
   product.price = productDto.price;
@@ -68,18 +66,26 @@ const updateProduct = async (productDto) => {
   product.colors = productDto.colors;
   product.tags = productDto.tags;
   product.description = productDto.description;
-  product.images = productDto.imageUrls
-  product.updatedDate = new Date();
 
+  if(productDto.imageUrls.length > 0){
+    product.images = productDto.imageUrls
+
+
+  product.updatedDate = new Date();
 
   await product.save();
 
-  return true;
+
+  if (!product) {
+    return null;
+  }
+
+  return product;
 
 }
 
-const deleteProductById = async (_id) => {
 
+const deleteProductById = async (_id) => {
   const product = await Products.findOne({ _id });
 
   if (!product) {
@@ -88,12 +94,12 @@ const deleteProductById = async (_id) => {
 
   await product.remove();
   return true;
-}
+};
 
 module.exports = {
   addProduct,
   getProducts,
   updateProduct,
   deleteProductById,
-  getProductsById
-}
+  getProductsById,
+};
