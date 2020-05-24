@@ -131,6 +131,8 @@ const updateProduct = async (req, res, next) => {
       throw new HTTP403Error("Details are required");
     }
 
+  
+
           // extract image files
       const imageFiles = req.files;
       const imageUrls = [];
@@ -143,6 +145,7 @@ const updateProduct = async (req, res, next) => {
         imageUrls.push(imageUrl);
       }
 
+      
 
       if (
         !(await roleService.hasPermission(
