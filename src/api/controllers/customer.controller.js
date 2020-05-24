@@ -125,6 +125,7 @@ const getCustomer = async (req, res, next) => {
 const addCustomerAddress = async (req, res, next) => {
   const { addressDto } = req.body;
   try {
+
     if (
       !addressDto.fName ||
       !addressDto.lName ||
@@ -135,6 +136,7 @@ const addCustomerAddress = async (req, res, next) => {
       !addressDto.zip
     ) {
       throw new HTTP403Error("Missing fields");
+
     }
 
     const customerInfo = req.decoded;
@@ -164,10 +166,12 @@ const deleteAddress = async (req, res, next) => {
       throw new HTTP403Error("Missing user id in the URL");
     }
 
+
     const result = await customerService.deleteCustomerAddress(
       customerInfo.id,
       id
     );
+
     if (result) {
       return res.json({ deleted: true });
     }
@@ -182,6 +186,7 @@ const updateAddress = async (req, res, next) => {
   const { addressDto } = req.body;
 
   try {
+
     if (
       !addressDto.fName ||
       !addressDto.lName ||
@@ -192,6 +197,7 @@ const updateAddress = async (req, res, next) => {
       !addressDto.zip
     ) {
       throw new HTTP403Error("Missing fields");
+
     }
 
     const customerInfo = req.decoded;
@@ -206,6 +212,7 @@ const updateAddress = async (req, res, next) => {
       return res.json(result);
     }
     return res.json(null);
+
   } catch (error) {
     next(error);
   }
@@ -224,6 +231,7 @@ const updateCustomerInfo = async (req, res, next) => {
       !customerInfoToUpdate.email
     ) {
       throw new HTTP403Error("Missing fields");
+
     }
 
     const customerInfo = req.decoded;
@@ -243,6 +251,7 @@ const updateCustomerInfo = async (req, res, next) => {
 };
 
 const updateCustomerPassword = async (req, res, next) => {
+
   const { currentPwd, newPwd } = req.body;
 
   try {
