@@ -75,9 +75,45 @@ const deleteReview = async (req, res, next) => {
         next(error);
     }
 }
+
+const upVoteReview = async (req, res, next) => {
+    const reviewId = req.params.reviewId;
+    try {
+        if (!reviewId) {
+            throw new HTTP403Error('Missing review id');
+        }
+
+        const result = await reviewService.upVoteReview(reviewId);
+
+        return res.json({ success: result });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+const downVoteReview = async (req, res, next) => {
+    const reviewId = req.params.reviewId;
+    try {
+        if (!reviewId) {
+            throw new HTTP403Error('Missing review id');
+        }
+
+        const result = await reviewService.downVoteReview(reviewId);
+
+        return res.json({ success: result });
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 module.exports = {
     createReview,
     getReviewsOfProduct,
     updateReview,
-    deleteReview
+    deleteReview,
+    upVoteReview,
+    downVoteReview
 }

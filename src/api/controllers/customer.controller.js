@@ -37,6 +37,7 @@ const login = async (req, res, next) => {
         isAuth: true,
         token,
         customer: {
+          id: customer._id,
           fName: customer.fName,
           lName: customer.lName,
           email: customer.email,
@@ -105,6 +106,7 @@ const getCustomer = async (req, res, next) => {
     const result = {
       isAuth: true,
       customer: {
+        id: customer._id,
         fName: customer.fName,
         lName: customer.lName,
         email: customer.email,

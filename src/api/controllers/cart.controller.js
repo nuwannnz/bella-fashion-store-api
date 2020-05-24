@@ -29,7 +29,12 @@ const addProductToCart = async (req, res, next) => {
       qty,
     });
 
-    return res.json(result);
+    if (result.succeded) {
+      return res.json(result);
+    } else {
+
+      return res.status(403).json(result);
+    }
   } catch (error) {
     next(error);
   }

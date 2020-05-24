@@ -18,6 +18,12 @@ module.exports = (app) => {
     // update review
     route.patch("/:reviewId", verifyJWTToken, reviewController.updateReview);
 
+    // upvote review
+    route.patch("/:reviewId/upvote", verifyJWTToken, reviewController.upVoteReview);
+
+    // downvote review
+    route.patch("/:reviewId/downvote", verifyJWTToken, reviewController.downVoteReview);
+
     // delete review
     route.delete("/:reviewId", verifyJWTToken, reviewController.deleteReview);
 

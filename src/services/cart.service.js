@@ -21,7 +21,7 @@ const addProductToCart = async (cartItemDto) => {
   if (!product) {
     return {
       succeded: false,
-      msg: "Requested product is not available",
+      message: "Requested product is not available",
     };
   }
   // check if size is available
@@ -32,7 +32,7 @@ const addProductToCart = async (cartItemDto) => {
   if (!sizeQty) {
     return {
       succeded: false,
-      msg: "Requested size is not available",
+      message: "Requested size is not available",
     };
   }
 
@@ -41,7 +41,7 @@ const addProductToCart = async (cartItemDto) => {
     // the requested quantity is not available
     return {
       succeded: false,
-      msg: "Requested quantity is not available",
+      message: "Requested quantity is not available",
     };
   }
 
