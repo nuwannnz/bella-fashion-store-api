@@ -70,8 +70,8 @@ const updateStaffMember = async (staffMemberDto) => {
     staffMember.lName = staffMemberDto.lName;
   }
 
-  if (staffMemberDto.role) {
-    staffMember.role = staffMemberDto.role;
+  if (staffMemberDto.roleId) {
+    staffMember.role = staffMemberDto.roleId;
   }
 
   if (staffMemberDto.email && staffMember.email !== staffMemberDto.email) {
