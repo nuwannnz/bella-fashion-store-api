@@ -18,7 +18,6 @@ const review = require("./routes/product-review");
 const forgotPwd = require("./routes/forgot-pwd");
 const homepage = require("./routes/homepage");
 
-const homepage = require("./routes/homepage");
 
 
 /** @description Register commonly used middleware
